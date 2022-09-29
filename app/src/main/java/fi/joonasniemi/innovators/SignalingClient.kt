@@ -1,4 +1,4 @@
-package com.developerspace.webrtcsample
+package fi.joonasniemi.innovators
 
 import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
@@ -122,7 +122,7 @@ class SignalingClient(
                                                     Math.toIntExact(data["sdpMLineIndex"] as Long),
                                                     data["sdpCandidate"].toString()))
                                 }
-                                Log.e(TAG, "candidateQuery: $dataSnapShot" )
+                                Log.d(TAG, "candidateQuery: $dataSnapShot" )
                             }
                         }
                     }
@@ -164,7 +164,7 @@ class SignalingClient(
             .document("$meetingID").collection("candidates").document(type)
             .set(candidateConstant as Map<String, Any>)
             .addOnSuccessListener {
-                Log.e(TAG, "sendIceCandidate: Success" )
+                Log.d(TAG, "sendIceCandidate: Success" )
             }
             .addOnFailureListener {
                 Log.e(TAG, "sendIceCandidate: Error $it" )

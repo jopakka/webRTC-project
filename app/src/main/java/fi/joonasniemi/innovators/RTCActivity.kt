@@ -1,4 +1,4 @@
-package com.developerspace.webrtcsample
+package fi.joonasniemi.innovators
 
 import android.Manifest
 import android.content.Intent
@@ -11,11 +11,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
+import fi.joonasniemi.innovators.R
+import io.ktor.util.*
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_start.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.webrtc.*
-import java.util.*
 
 @ExperimentalCoroutinesApi
 class RTCActivity : AppCompatActivity() {
@@ -108,7 +108,7 @@ class RTCActivity : AppCompatActivity() {
     private fun checkCameraAndAudioPermission() {
         if ((ContextCompat.checkSelfPermission(this, CAMERA_PERMISSION)
                     != PackageManager.PERMISSION_GRANTED) &&
-            (ContextCompat.checkSelfPermission(this,AUDIO_PERMISSION)
+            (ContextCompat.checkSelfPermission(this, AUDIO_PERMISSION)
                     != PackageManager.PERMISSION_GRANTED)) {
             requestCameraAndAudioPermission()
         } else {
@@ -128,36 +128,36 @@ class RTCActivity : AppCompatActivity() {
 
                     override fun onAddStream(p0: MediaStream?) {
                         super.onAddStream(p0)
-                        Log.e(TAG, "onAddStream: $p0")
+                        Log.d(TAG, "onAddStream: $p0")
                         p0?.videoTracks?.get(0)?.addSink(remote_view)
                     }
 
                     override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {
-                        Log.e(TAG, "onIceConnectionChange: $p0")
+                        Log.d(TAG, "onIceConnectionChange: $p0")
                     }
 
                     override fun onIceConnectionReceivingChange(p0: Boolean) {
-                        Log.e(TAG, "onIceConnectionReceivingChange: $p0")
+                        Log.d(TAG, "onIceConnectionReceivingChange: $p0")
                     }
 
                     override fun onConnectionChange(newState: PeerConnection.PeerConnectionState?) {
-                        Log.e(TAG, "onConnectionChange: $newState")
+                        Log.d(TAG, "onConnectionChange: $newState")
                     }
 
                     override fun onDataChannel(p0: DataChannel?) {
-                        Log.e(TAG, "onDataChannel: $p0")
+                        Log.d(TAG, "onDataChannel: $p0")
                     }
 
                     override fun onStandardizedIceConnectionChange(newState: PeerConnection.IceConnectionState?) {
-                        Log.e(TAG, "onStandardizedIceConnectionChange: $newState")
+                        Log.d(TAG, "onStandardizedIceConnectionChange: $newState")
                     }
 
                     override fun onAddTrack(p0: RtpReceiver?, p1: Array<out MediaStream>?) {
-                        Log.e(TAG, "onAddTrack: $p0 \n $p1")
+                        Log.d(TAG, "onAddTrack: $p0 \n $p1")
                     }
 
                     override fun onTrack(transceiver: RtpTransceiver?) {
-                        Log.e(TAG, "onTrack: $transceiver" )
+                        Log.d(TAG, "onTrack: $transceiver" )
                     }
                 }
         )

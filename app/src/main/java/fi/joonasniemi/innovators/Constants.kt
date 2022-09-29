@@ -1,4 +1,4 @@
-package com.developerspace.webrtcsample
+package fi.joonasniemi.innovators
 
 class Constants {
     companion object {

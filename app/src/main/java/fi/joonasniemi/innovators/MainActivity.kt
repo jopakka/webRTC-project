@@ -1,8 +1,10 @@
-package com.developerspace.webrtcsample
+package fi.joonasniemi.innovators
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import fi.joonasniemi.innovators.R
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_start.*

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.developerspace.webrtcsample">
+    package="fi.joonasniemi.innovators">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WebRTCSample">
-        <activity android:name="com.developerspace.webrtcsample.MainActivity"
+        <activity android:name="fi.joonasniemi.innovators.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.FullScreen">
             <intent-filter>
@@ -23,7 +23,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.developerspace.webrtcsample.RTCActivity"
+        <activity android:name="fi.joonasniemi.innovators.RTCActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.FullScreen"/>
     </application>
