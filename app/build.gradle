@@ -9,7 +9,7 @@ android {
     buildToolsVersion '31.0.0'
 
     defaultConfig {
-        applicationId "fi.joonasniemi.innovators"
+        applicationId "com.monitor.app"
         minSdkVersion 21
         targetSdkVersion 33
         versionCode 1
