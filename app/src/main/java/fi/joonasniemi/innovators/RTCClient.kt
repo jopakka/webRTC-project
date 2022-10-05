@@ -79,14 +79,16 @@ class RTCClient(
     private fun getVideoCapturer(context: Context) =
         Camera2Enumerator(context).run {
             deviceNames.find {
-                isFrontFacing(it)
+                Log.d(TAG, "Camera: $it")
+//                isFrontFacing(it)
+                it == deviceNames.last()
             }?.let {
                 createCapturer(it, null)
             } ?: throw IllegalStateException()
         }
 
-    fun initSurfaceView(view: SurfaceViewRenderer) = view.run {
-        setMirror(true)
+    fun initSurfaceView(view: SurfaceViewRenderer, mirror: Boolean = false) = view.run {
+        setMirror(mirror)
         setEnableHardwareScaler(true)
         init(rootEglBase.eglBaseContext, null)
     }
@@ -99,7 +101,7 @@ class RTCClient(
             localVideoOutput.context,
             localVideoSource.capturerObserver
         )
-        videoCapturer.startCapture(320, 240, 60)
+        videoCapturer.startCapture(640, 480, 60)
         localAudioTrack =
             peerConnectionFactory.createAudioTrack(LOCAL_TRACK_ID + "_audio", audioSource)
         localVideoTrack = peerConnectionFactory.createVideoTrack(LOCAL_TRACK_ID, localVideoSource)
