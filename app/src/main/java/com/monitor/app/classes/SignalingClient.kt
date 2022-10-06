@@ -139,7 +139,7 @@ class SignalingClient(
         )
         db.collection(userID)
             .document(sensorID).collection("candidates").document(type)
-            .update(candidateConstant as Map<String, *>)
+            .set(candidateConstant as Map<String, *>)
             .addOnSuccessListener {
                 Log.d(TAG, "sendIceCandidate: Success")
             }
