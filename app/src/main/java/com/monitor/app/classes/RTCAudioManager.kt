@@ -1,4 +1,4 @@
-package com.monitor.app
+package com.monitor.app.classes
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -11,7 +11,6 @@ import android.media.AudioManager.OnAudioFocusChangeListener
 import android.os.Build
 import android.preference.PreferenceManager
 import android.util.Log
-import androidx.annotation.Nullable
 import com.monitor.app.R
 import org.webrtc.ThreadUtils
 import java.util.*
@@ -42,10 +41,8 @@ class RTCAudioManager(context: Context) {
 
     private val apprtcContext: Context
 
-    @Nullable
     private val audioManager: AudioManager
 
-    @Nullable
     private var audioManagerEvents: AudioManagerEvents? = null
     private var amState: AudioManagerState
     private var savedAudioMode = AudioManager.MODE_INVALID
@@ -69,7 +66,6 @@ class RTCAudioManager(context: Context) {
     private var userSelectedAudioDevice: AudioDevice? = null
 
     // Contains speakerphone setting: auto, true or false
-    @Nullable
     private val useSpeakerphone: String?
 
 
@@ -81,7 +77,6 @@ class RTCAudioManager(context: Context) {
     private val wiredHeadsetReceiver: BroadcastReceiver
 
     // Callback method for changes in audio focus.
-    @Nullable
     private var audioFocusChangeListener: OnAudioFocusChangeListener? = null
 
 
@@ -137,21 +132,15 @@ class RTCAudioManager(context: Context) {
                 // and whether that loss is transient, or whether the new focus holder will hold it for an
                 // unknown amount of time.
 
-                val typeOfChange: String
-                when (focusChange) {
-                    AudioManager.AUDIOFOCUS_GAIN -> typeOfChange = "AUDIOFOCUS_GAIN"
-                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT -> typeOfChange =
-                        "AUDIOFOCUS_GAIN_TRANSIENT"
-                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE -> typeOfChange =
-                        "AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE"
-                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK -> typeOfChange =
-                        "AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK"
-                    AudioManager.AUDIOFOCUS_LOSS -> typeOfChange = "AUDIOFOCUS_LOSS"
-                    AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> typeOfChange =
-                        "AUDIOFOCUS_LOSS_TRANSIENT"
-                    AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> typeOfChange =
-                        "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK"
-                    else -> typeOfChange = "AUDIOFOCUS_INVALID"
+                val typeOfChange: String = when (focusChange) {
+                    AudioManager.AUDIOFOCUS_GAIN -> "AUDIOFOCUS_GAIN"
+                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT -> "AUDIOFOCUS_GAIN_TRANSIENT"
+                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE -> "AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE"
+                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK -> "AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK"
+                    AudioManager.AUDIOFOCUS_LOSS -> "AUDIOFOCUS_LOSS"
+                    AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> "AUDIOFOCUS_LOSS_TRANSIENT"
+                    AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK"
+                    else -> "AUDIOFOCUS_INVALID"
                 }
                 Log.d(TAG, "onAudioFocusChange: $typeOfChange")
             }
@@ -239,10 +228,10 @@ class RTCAudioManager(context: Context) {
         ThreadUtils.checkIsOnMainThread()
         when (defaultDevice) {
             AudioDevice.SPEAKER_PHONE -> defaultAudioDevice = defaultDevice
-            AudioDevice.EARPIECE -> if (hasEarpiece()) {
-                defaultAudioDevice = defaultDevice
+            AudioDevice.EARPIECE -> defaultAudioDevice = if (hasEarpiece()) {
+                defaultDevice
             } else {
-                defaultAudioDevice = AudioDevice.SPEAKER_PHONE
+                AudioDevice.SPEAKER_PHONE
             }
             else -> Log.e(TAG, "Invalid default audio device selection")
         }
@@ -305,7 +294,7 @@ class RTCAudioManager(context: Context) {
 
     /** Gets the current earpiece state.  */
     private fun hasEarpiece(): Boolean {
-        return apprtcContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEPHONY)
+        return apprtcContext.packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)
     }
 
     /**
@@ -367,7 +356,7 @@ class RTCAudioManager(context: Context) {
             }
         }
         // Store state which is set to true if the device list has changed.
-        var audioDeviceSetUpdated = audioDevices != newAudioDevices
+        val audioDeviceSetUpdated = audioDevices != newAudioDevices
         // Update the existing audio device set.
         audioDevices = newAudioDevices
         // Correct user selected audio devices if needed.
@@ -384,17 +373,16 @@ class RTCAudioManager(context: Context) {
 
 
         // Update selected audio device.
-        val newAudioDevice: AudioDevice?
-        if (hasWiredHeadset) {
+        val newAudioDevice: AudioDevice? = if (hasWiredHeadset) {
             // If a wired headset is connected, but Bluetooth is not, then wired headset is used as
             // audio device.
-            newAudioDevice = AudioDevice.WIRED_HEADSET
+            AudioDevice.WIRED_HEADSET
         } else {
             // No wired headset and no Bluetooth, hence the audio-device list can contain speaker
             // phone (on a tablet), or speaker phone and earpiece (on mobile phone).
             // |defaultAudioDevice| contains either AudioDevice.SPEAKER_PHONE or AudioDevice.EARPIECE
             // depending on the user's selection.
-            newAudioDevice = defaultAudioDevice
+            defaultAudioDevice
         }
         // Switch to new device but only if there has been any changes.
         if (newAudioDevice != selectedAudioDevice || audioDeviceSetUpdated) {
@@ -438,10 +426,10 @@ class RTCAudioManager(context: Context) {
             context.getString(R.string.pref_speakerphone_default)
         )
         Log.d(TAG, "useSpeakerphone: $useSpeakerphone")
-        if ((useSpeakerphone == SPEAKERPHONE_FALSE)) {
-            defaultAudioDevice = AudioDevice.EARPIECE
+        defaultAudioDevice = if (useSpeakerphone == SPEAKERPHONE_FALSE) {
+            AudioDevice.EARPIECE
         } else {
-            defaultAudioDevice = AudioDevice.SPEAKER_PHONE
+            AudioDevice.SPEAKER_PHONE
         }
         Log.d(TAG, "defaultAudioDevice: $defaultAudioDevice")
     }

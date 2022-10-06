@@ -1,4 +1,4 @@
-package com.monitor.app
+package com.monitor.app.classes
 
 import android.app.Application
 import android.content.Context
@@ -112,7 +112,7 @@ class RTCClient(
         peerConnection?.addStream(localStream)
     }
 
-    private fun PeerConnection.call(sdpObserver: SdpObserver, meetingID: String) {
+    private fun PeerConnection.call(sdpObserver: SdpObserver, userID: String, sensorID: String) {
         val constraints = MediaConstraints().apply {
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
         }
@@ -125,11 +125,12 @@ class RTCClient(
                     }
 
                     override fun onSetSuccess() {
+                        Log.e(TAG, "onSetSuccess")
                         val offer = hashMapOf(
                             "sdp" to desc?.description,
                             "type" to desc?.type
                         )
-                        db.collection("calls").document(meetingID)
+                        db.collection(userID).document(sensorID)
                             .set(offer)
                             .addOnSuccessListener {
                                 Log.d(TAG, "DocumentSnapshot added")
@@ -161,7 +162,7 @@ class RTCClient(
         }, constraints)
     }
 
-    private fun PeerConnection.answer(sdpObserver: SdpObserver, meetingID: String) {
+    private fun PeerConnection.answer(sdpObserver: SdpObserver, userID: String, sensorID: String) {
         val constraints = MediaConstraints().apply {
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
         }
@@ -171,7 +172,7 @@ class RTCClient(
                     "sdp" to desc?.description,
                     "type" to desc?.type
                 )
-                db.collection("calls").document(meetingID)
+                db.collection(userID).document(sensorID)
                     .set(answer)
                     .addOnSuccessListener {
                         Log.d(TAG, "DocumentSnapshot added")
@@ -205,11 +206,11 @@ class RTCClient(
         }, constraints)
     }
 
-    fun call(sdpObserver: SdpObserver, meetingID: String) =
-        peerConnection?.call(sdpObserver, meetingID)
+    fun call(sdpObserver: SdpObserver, userID: String, sensorID: String) =
+        peerConnection?.call(sdpObserver, userID, sensorID)
 
-    fun answer(sdpObserver: SdpObserver, meetingID: String) =
-        peerConnection?.answer(sdpObserver, meetingID)
+    fun answer(sdpObserver: SdpObserver, userID: String, sensorID: String) =
+        peerConnection?.answer(sdpObserver, userID, sensorID)
 
     fun onRemoteSessionReceived(sessionDescription: SessionDescription) {
         remoteSessionDescription = sessionDescription
@@ -242,13 +243,13 @@ class RTCClient(
             .get().addOnSuccessListener {
                 val iceCandidateArray: MutableList<IceCandidate> = mutableListOf()
                 for (dataSnapshot in it) {
-                    if (dataSnapshot.contains("type") && dataSnapshot["type"] == "offerCandidate") {
-                        val offerCandidate = dataSnapshot
+                    if (dataSnapshot.contains("type") && dataSnapshot["type"] == "sensor") {
+                        val sensor = dataSnapshot
                         iceCandidateArray.add(
                             IceCandidate(
-                                offerCandidate["sdpMid"].toString(),
-                                Math.toIntExact(offerCandidate["sdpMLineIndex"] as Long),
-                                offerCandidate["sdp"].toString()
+                                sensor["sdpMid"].toString(),
+                                Math.toIntExact(sensor["sdpMLineIndex"] as Long),
+                                sensor["sdp"].toString()
                             )
                         )
                     } else if (dataSnapshot.contains("type") && dataSnapshot["type"] == "answerCandidate") {

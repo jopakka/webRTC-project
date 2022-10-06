@@ -37,7 +37,6 @@ class TestViewModel : ViewModel() {
                         data["createdAt"]?.toString()?.toLong() ?: 0
                     )
                     val key = snapshot.id
-                    Log.d(TAG, "Info: ${data["info"]}")
                     try {
                         _sensors[key] = info
                     } catch (e: Error) {

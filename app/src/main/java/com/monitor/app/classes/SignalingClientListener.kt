@@ -1,4 +1,4 @@
-package com.monitor.app
+package com.monitor.app.classes
 
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
