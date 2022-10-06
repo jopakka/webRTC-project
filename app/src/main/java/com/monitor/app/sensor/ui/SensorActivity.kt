@@ -2,11 +2,8 @@ package com.monitor.app.sensor.ui
 
 import android.Manifest
 import android.app.Application
-import android.content.Context
-import android.content.pm.PackageManager
 import android.util.Log
 import android.view.LayoutInflater
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
@@ -17,22 +14,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
-import com.monitor.app.R
-import com.monitor.app.sensor.SensorSendViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.monitor.app.R
 import com.monitor.app.classes.*
+import com.monitor.app.sensor.SensorSendViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.webrtc.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
-fun SensorSendScreen(userId: String, sensorId: String, viewModel: SensorSendViewModel = viewModel()) {
+fun SensorSendScreen(
+    userId: String,
+    sensorId: String,
+    viewModel: SensorSendViewModel = viewModel()
+) {
     Log.d("SensorSendScreen", "userId=$userId, sensorId=$sensorId")
     val permissions = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
     val hasPermissions = viewModel.hasPermissions
@@ -136,7 +135,7 @@ fun SensorSendScreen(userId: String, sensorId: String, viewModel: SensorSendView
 
     viewModel.checkAndRequestPermissions(LocalContext.current, permissions, launcher)
 
-    if(hasPermissions.value) {
+    if (hasPermissions.value) {
         onCameraAndAudioPermissionGranted(LocalContext.current.applicationContext as Application)
         VideoView(rtcClient)
     }
@@ -157,8 +156,8 @@ fun VideoView(rtcClient: RTCClient) {
         AndroidView(
             factory = { context ->
                 val view =
-                    LayoutInflater.from(context).inflate(R.layout.activity_sensor_send, null, false)
-                val localView = view.findViewById<SurfaceViewRenderer>(R.id.local_view)
+                    LayoutInflater.from(context).inflate(R.layout.webrtc_video_view, null, false)
+                val localView = view.findViewById<SurfaceViewRenderer>(R.id.video_view)
                 rtcClient.initSurfaceView(localView)
                 rtcClient.startLocalVideoCapture(localView)
                 view
