@@ -20,6 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.monitor.app.R
 import com.monitor.app.classes.*
+import com.monitor.app.sensor.ui.KeepScreenOn
 import com.monitor.app.sensorview.SensorViewViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.webrtc.*
@@ -42,6 +43,7 @@ fun VideoView(
     userId: String,
     sensorId: String
 ) {
+    KeepScreenOn()
     Scaffold {
         AndroidView(
             factory = { context ->
@@ -58,11 +60,10 @@ fun VideoView(
                 val sdpObserver = object : AppSdpObserver() {
                     override fun onCreateSuccess(p0: SessionDescription?) {
                         super.onCreateSuccess(p0)
-//            signallingClient.send(p0)
+                        Log.d(TAG, "sdpObserver onCreateSuccess")
                     }
-                }
 
-                var isJoin = true
+                }
 
                 fun createSignallingClientListener() = object : SignalingClientListener {
                     override fun onConnectionEstablished() {
@@ -71,6 +72,8 @@ fun VideoView(
 
                     override fun onOfferReceived(description: SessionDescription) {
                         Log.d(TAG, "onOfferReceived")
+                        rtcClient.onRemoteSessionReceived(description)
+                        rtcClient.answer(sdpObserver, userId, sensorId)
                     }
 
                     override fun onAnswerReceived(description: SessionDescription) {
@@ -80,6 +83,7 @@ fun VideoView(
 
                     override fun onIceCandidateReceived(iceCandidate: IceCandidate) {
                         Log.d(TAG, "onIceCandidateReceived")
+                        rtcClient.addIceCandidate(iceCandidate)
                     }
 
                     override fun onCallEnded() {
@@ -94,7 +98,7 @@ fun VideoView(
                             override fun onIceCandidate(p0: IceCandidate?) {
                                 super.onIceCandidate(p0)
                                 Log.d(TAG, "onIceCandidate: candidate=$p0")
-                                signallingClient.sendIceCandidate(p0, isJoin)
+                                signallingClient.sendIceCandidate(p0, false)
                                 rtcClient.addIceCandidate(p0)
                             }
 
@@ -136,8 +140,6 @@ fun VideoView(
 
                     signallingClient =
                         SignalingClient(userId, sensorId, createSignallingClientListener())
-                    if (!isJoin)
-                        rtcClient.call(sdpObserver, userId, sensorId)
                 }
 
                 onCameraAndAudioPermissionGranted(context.applicationContext as Application)

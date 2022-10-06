@@ -79,7 +79,6 @@ class RTCClient(
     private fun getVideoCapturer(context: Context) =
         Camera2Enumerator(context).run {
             deviceNames.find {
-                Log.d(TAG, "Camera: $it")
 //                isFrontFacing(it)
                 it == deviceNames.last()
             }?.let {
@@ -121,7 +120,7 @@ class RTCClient(
             override fun onCreateSuccess(desc: SessionDescription?) {
                 setLocalDescription(object : SdpObserver {
                     override fun onSetFailure(p0: String?) {
-                        Log.e(TAG, "onSetFailure: $p0")
+                        Log.e(TAG, "onSetFailure-setLocalDescription: $p0")
                     }
 
                     override fun onSetSuccess() {
@@ -153,7 +152,7 @@ class RTCClient(
             }
 
             override fun onSetFailure(p0: String?) {
-                Log.e(TAG, "onSetFailure: $p0")
+                Log.e(TAG, "onSetFailure-createOffer: $p0")
             }
 
             override fun onCreateFailure(p0: String?) {
@@ -182,7 +181,7 @@ class RTCClient(
                     }
                 setLocalDescription(object : SdpObserver {
                     override fun onSetFailure(p0: String?) {
-                        Log.e(TAG, "onSetFailure: $p0")
+                        Log.e(TAG, "onSetFailure-setLocalDescription: $p0")
                     }
 
                     override fun onSetSuccess() {
@@ -214,9 +213,10 @@ class RTCClient(
 
     fun onRemoteSessionReceived(sessionDescription: SessionDescription) {
         remoteSessionDescription = sessionDescription
+        Log.d(TAG, "peerConnection: ${peerConnection?.connectionState()}")
         peerConnection?.setRemoteDescription(object : SdpObserver {
             override fun onSetFailure(p0: String?) {
-                Log.e(TAG, "onSetFailure: $p0")
+                Log.e(TAG, "onSetFailure-setRemoteDescription: $p0")
             }
 
             override fun onSetSuccess() {
@@ -243,7 +243,7 @@ class RTCClient(
             .get().addOnSuccessListener {
                 val iceCandidateArray: MutableList<IceCandidate> = mutableListOf()
                 for (dataSnapshot in it) {
-                    if (dataSnapshot.contains("type") && dataSnapshot["type"] == "sensor") {
+                    if (dataSnapshot.contains("type") && dataSnapshot["type"] == "offerCandidate") {
                         val sensor = dataSnapshot
                         iceCandidateArray.add(
                             IceCandidate(
@@ -269,7 +269,7 @@ class RTCClient(
             "type" to "END_CALL"
         )
         db.collection("calls").document(meetingID)
-            .set(endCall)
+            .update(endCall as Map<String, *>)
             .addOnSuccessListener {
                 Log.d(TAG, "DocumentSnapshot added")
             }

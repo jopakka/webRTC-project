@@ -53,11 +53,8 @@ fun SensorSendScreen(
     val sdpObserver = object : AppSdpObserver() {
         override fun onCreateSuccess(p0: SessionDescription?) {
             super.onCreateSuccess(p0)
-//            signallingClient.send(p0)
         }
     }
-
-    var isJoin = false
 
     fun createSignallingClientListener() = object : SignalingClientListener {
         override fun onConnectionEstablished() {
@@ -67,15 +64,16 @@ fun SensorSendScreen(
         override fun onOfferReceived(description: SessionDescription) {
             Log.d(TAG, "onOfferReceived")
             rtcClient.onRemoteSessionReceived(description)
-            rtcClient.answer(sdpObserver, userId, sensorId)
         }
 
         override fun onAnswerReceived(description: SessionDescription) {
             Log.d(TAG, "onAnswerReceived")
+            rtcClient.onRemoteSessionReceived(description)
         }
 
         override fun onIceCandidateReceived(iceCandidate: IceCandidate) {
             Log.d(TAG, "onIceCandidateReceived")
+            rtcClient.addIceCandidate(iceCandidate)
         }
 
         override fun onCallEnded() {
@@ -90,14 +88,13 @@ fun SensorSendScreen(
                 override fun onIceCandidate(p0: IceCandidate?) {
                     super.onIceCandidate(p0)
                     Log.d(TAG, "onIceCandidate: candidate=$p0")
-                    signallingClient.sendIceCandidate(p0, isJoin)
+                    signallingClient.sendIceCandidate(p0, true)
                     rtcClient.addIceCandidate(p0)
                 }
 
                 override fun onAddStream(p0: MediaStream?) {
                     super.onAddStream(p0)
                     Log.d(TAG, "onAddStream: $p0")
-//                    p0?.videoTracks?.get(0)?.addSink(remote_view)
                 }
 
                 override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {
@@ -131,8 +128,7 @@ fun SensorSendScreen(
         )
 
         signallingClient = SignalingClient(userId, sensorId, createSignallingClientListener())
-        if (!isJoin)
-            rtcClient.call(sdpObserver, userId, sensorId)
+        rtcClient.call(sdpObserver, userId, sensorId)
     }
 
     viewModel.checkAndRequestPermissions(LocalContext.current, permissions, launcher)

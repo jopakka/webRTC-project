@@ -97,7 +97,7 @@ class SignalingClient(
                         for (dataSnapShot in querysnapshot) {
 
                             val data = dataSnapShot.data
-                            if (SDPtype == "Offer" && data.containsKey("type") && data.get("type") == "sensor") {
+                            if (SDPtype == "Offer" && data.containsKey("type") && data.get("type") == "offerCandidate") {
                                 listener.onIceCandidateReceived(
                                     IceCandidate(
                                         data["sdpMid"].toString(),
@@ -125,10 +125,10 @@ class SignalingClient(
         }
     }
 
-    fun sendIceCandidate(candidate: IceCandidate?, isJoin: Boolean) = runBlocking {
+    fun sendIceCandidate(candidate: IceCandidate?, isSensor: Boolean) = runBlocking {
         val type = when {
-            isJoin -> "answerCandidate"
-            else -> "sensor"
+            isSensor -> "offerCandidate"
+            else -> "answerCandidate"
         }
         val candidateConstant = hashMapOf(
             "serverUrl" to candidate?.serverUrl,
