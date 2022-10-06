@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.monitor.app.classes.RTCClient
 import com.monitor.app.main.ui.SensorsScreen
 import com.monitor.app.sensor.ui.SensorSendScreen
+import com.monitor.app.sensorview.ui.SensorViewScreen
 
 @Composable
 fun AppNavHost(
@@ -24,6 +25,12 @@ fun AppNavHost(
         }
         composable("sensorSend/{userID}/{sensorID}") {
             SensorSendScreen(
+                it.arguments?.getString("userID")!!,
+                it.arguments?.getString("sensorID")!!,
+            )
+        }
+        composable("sensorView/{userID}/{sensorID}") {
+            SensorViewScreen(
                 it.arguments?.getString("userID")!!,
                 it.arguments?.getString("sensorID")!!,
             )

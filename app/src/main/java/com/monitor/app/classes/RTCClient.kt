@@ -125,13 +125,13 @@ class RTCClient(
                     }
 
                     override fun onSetSuccess() {
-                        Log.e(TAG, "onSetSuccess")
+                        Log.d(TAG, "onSetSuccess")
                         val offer = hashMapOf(
                             "sdp" to desc?.description,
                             "type" to desc?.type
                         )
                         db.collection(userID).document(sensorID)
-                            .set(offer)
+                            .update(offer as Map<String, *>)
                             .addOnSuccessListener {
                                 Log.d(TAG, "DocumentSnapshot added")
                             }
@@ -173,7 +173,7 @@ class RTCClient(
                     "type" to desc?.type
                 )
                 db.collection(userID).document(sensorID)
-                    .set(answer)
+                    .update(answer as Map<String, *>)
                     .addOnSuccessListener {
                         Log.d(TAG, "DocumentSnapshot added")
                     }

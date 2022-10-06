@@ -31,12 +31,13 @@ class TestViewModel : ViewModel() {
 
                 for (snapshot in querySnapshot) {
                     val data = snapshot.data
+                    val key = snapshot.id
                     val info = SensorInfo(
                         data["name"].toString(),
                         data["info"].toString(),
-                        data["createdAt"]?.toString()?.toLong() ?: 0
+                        data["createdAt"]?.toString()?.toLong() ?: 0,
+                        key
                     )
-                    val key = snapshot.id
                     try {
                         _sensors[key] = info
                     } catch (e: Error) {

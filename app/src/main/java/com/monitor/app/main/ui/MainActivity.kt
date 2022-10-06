@@ -63,7 +63,10 @@ fun SensorsScreen(navigator: NavHostController, viewModel: TestViewModel = viewM
                     .padding(it)
             ) {
                 Text(text = "Sensors", style = MaterialTheme.typography.h1)
-                SensorList(sensors = sensors)
+                SensorList(sensors = sensors) {id ->
+                    val user = "user-1"
+                    navigator.navigate("sensorView/$user/$id")
+                }
             }
         }
     )
@@ -111,15 +114,15 @@ fun SensorsScreen(navigator: NavHostController, viewModel: TestViewModel = viewM
 @Preview
 @Composable
 fun PreviewSensorList() {
-    SensorList(SampleData.sensors)
+    SensorList(SampleData.sensors) {}
 }
 
 @Composable
-fun SensorList(sensors: List<SensorInfo>) {
+fun SensorList(sensors: List<SensorInfo>, itemOnClick: (id: String) -> Unit) {
     Surface(modifier = Modifier.fillMaxSize()) {
         LazyColumn {
             items(sensors) { sensor ->
-                ListItem(sensor)
+                ListItem(sensor, itemOnClick)
             }
         }
     }
@@ -127,11 +130,11 @@ fun SensorList(sensors: List<SensorInfo>) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ListItem(sensorInfo: SensorInfo) {
+fun ListItem(sensorInfo: SensorInfo, onClick: (id: String) -> Unit) {
     Card(modifier = Modifier
         .padding(all = 8.dp)
         .fillMaxWidth(),
-        onClick = { Log.d("ListItem", "HELLO ${sensorInfo.name}") }) {
+        onClick = { onClick(sensorInfo.id ?: "") }) {
         Column(modifier = Modifier.padding(all = 4.dp)) {
             Text(text = sensorInfo.name, style = MaterialTheme.typography.subtitle1)
             Spacer(modifier = Modifier.width(8.dp))
@@ -143,5 +146,5 @@ fun ListItem(sensorInfo: SensorInfo) {
 @Preview
 @Composable
 fun PreviewListItem() {
-    ListItem(SensorInfo("Testi", "Jee"))
+    ListItem(SensorInfo("Testi", "Jee")) {}
 }

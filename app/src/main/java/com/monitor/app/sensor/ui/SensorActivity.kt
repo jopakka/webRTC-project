@@ -66,6 +66,8 @@ fun SensorSendScreen(
 
         override fun onOfferReceived(description: SessionDescription) {
             Log.d(TAG, "onOfferReceived")
+            rtcClient.onRemoteSessionReceived(description)
+            rtcClient.answer(sdpObserver, userId, sensorId)
         }
 
         override fun onAnswerReceived(description: SessionDescription) {
