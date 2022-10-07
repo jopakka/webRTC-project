@@ -1,6 +1,5 @@
 package com.monitor.app.main.ui
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,27 +8,27 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.monitor.app.main.TestViewModel
+import androidx.navigation.NavHostController
+import com.monitor.app.Constants
 import com.monitor.app.classes.SampleData
 import com.monitor.app.classes.SensorInfo
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.navigation.NavHostController
+import com.monitor.app.main.MainViewModel
 
 @Composable
-fun SensorsScreen(navigator: NavHostController, viewModel: TestViewModel = viewModel()) {
+fun SensorsScreen(navigator: NavHostController, viewModel: MainViewModel = viewModel()) {
     val sensors = viewModel.sensors
     var name by remember { mutableStateOf("") }
     var info by remember { mutableStateOf("") }
     val openDialog = remember { mutableStateOf(false) }
+
+    Constants.isIntiatedNow = true
+    Constants.isCallEnded = true
 
     val fabOnClick = {
         openDialog.value = true
@@ -63,7 +62,10 @@ fun SensorsScreen(navigator: NavHostController, viewModel: TestViewModel = viewM
                     .padding(it)
             ) {
                 Text(text = "Sensors", style = MaterialTheme.typography.h1)
-                SensorList(sensors = sensors)
+                SensorList(sensors = sensors) { id ->
+                    val user = "user-1"
+                    navigator.navigate("sensorView/$user/$id")
+                }
             }
         }
     )
@@ -80,7 +82,7 @@ fun SensorsScreen(navigator: NavHostController, viewModel: TestViewModel = viewM
                             name = it
                         },
                         placeholder = { Text("Living room, yard, etc...") },
-                        label = {Text("Name")},
+                        label = { Text("Name") },
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
                     )
                     TextField(
@@ -89,7 +91,7 @@ fun SensorsScreen(navigator: NavHostController, viewModel: TestViewModel = viewM
                             info = it
                         },
                         placeholder = { Text("Behind garage door, etc...") },
-                        label = {Text("Info")},
+                        label = { Text("Info") },
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
                     )
                 }
@@ -111,15 +113,15 @@ fun SensorsScreen(navigator: NavHostController, viewModel: TestViewModel = viewM
 @Preview
 @Composable
 fun PreviewSensorList() {
-    SensorList(SampleData.sensors)
+    SensorList(SampleData.sensors) {}
 }
 
 @Composable
-fun SensorList(sensors: List<SensorInfo>) {
+fun SensorList(sensors: List<SensorInfo>, itemOnClick: (id: String) -> Unit) {
     Surface(modifier = Modifier.fillMaxSize()) {
         LazyColumn {
             items(sensors) { sensor ->
-                ListItem(sensor)
+                ListItem(sensor, itemOnClick)
             }
         }
     }
@@ -127,11 +129,11 @@ fun SensorList(sensors: List<SensorInfo>) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ListItem(sensorInfo: SensorInfo) {
+fun ListItem(sensorInfo: SensorInfo, onClick: (id: String) -> Unit) {
     Card(modifier = Modifier
         .padding(all = 8.dp)
         .fillMaxWidth(),
-        onClick = { Log.d("ListItem", "HELLO ${sensorInfo.name}") }) {
+        onClick = { onClick(sensorInfo.id ?: "") }) {
         Column(modifier = Modifier.padding(all = 4.dp)) {
             Text(text = sensorInfo.name, style = MaterialTheme.typography.subtitle1)
             Spacer(modifier = Modifier.width(8.dp))
@@ -143,5 +145,5 @@ fun ListItem(sensorInfo: SensorInfo) {
 @Preview
 @Composable
 fun PreviewListItem() {
-    ListItem(SensorInfo("Testi", "Jee"))
+    ListItem(SensorInfo("Testi", "Jee")) {}
 }

@@ -8,7 +8,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.monitor.app.classes.SensorInfo
 
-class TestViewModel : ViewModel() {
+class MainViewModel : ViewModel() {
     private val TAG = "TestViewModel"
     private val firestore = Firebase.firestore
     private val _sensors = mutableStateMapOf<String, SensorInfo>()
@@ -27,24 +27,25 @@ class TestViewModel : ViewModel() {
                     return@addSnapshotListener
                 }
 
-                if (querySnapshot == null || querySnapshot.isEmpty) return@addSnapshotListener;
+                _sensors.clear()
+
+                if (querySnapshot == null || querySnapshot.isEmpty) return@addSnapshotListener
 
                 for (snapshot in querySnapshot) {
                     val data = snapshot.data
-                    val info = SensorInfo(
-                        data["name"].toString(),
-                        data["info"].toString(),
-                        data["createdAt"]?.toString()?.toLong() ?: 0
-                    )
                     val key = snapshot.id
-                    Log.d(TAG, "Info: ${data["info"]}")
                     try {
+                        val info = SensorInfo(
+                            data["name"].toString(),
+                            data["info"].toString(),
+                            data["createdAt"]?.toString()?.toLong() ?: 0,
+                            key
+                        )
                         _sensors[key] = info
                     } catch (e: Error) {
                         Log.w(TAG, "${e.message}")
                     }
                 }
-                Log.d(TAG, sensors.toString())
             }
         } catch (e: Error) {
             Log.e(TAG, "${e.message}")
