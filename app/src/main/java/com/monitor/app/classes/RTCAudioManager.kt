@@ -14,7 +14,6 @@ import android.util.Log
 import com.monitor.app.R
 import org.webrtc.ThreadUtils
 import java.util.*
-import kotlin.collections.HashSet
 
 
 class RTCAudioManager(context: Context) {
@@ -88,10 +87,11 @@ class RTCAudioManager(context: Context) {
             val name = intent.getStringExtra("name")
             Log.d(
                 TAG, "WiredHeadsetReceiver.onReceive"
-                    + ": " + "a=" + intent.action.toString() + ", s=" +
-                    (if (state == STATE_UNPLUGGED) "unplugged" else "plugged").toString()
-                    + ", m=" + (if (microphone == HAS_MIC) "mic" else "no mic").toString()
-                    + ", n=" + name.toString() + ", sb=" + isInitialStickyBroadcast)
+                        + ": " + "a=" + intent.action.toString() + ", s=" +
+                        (if (state == STATE_UNPLUGGED) "unplugged" else "plugged").toString()
+                        + ", m=" + (if (microphone == HAS_MIC) "mic" else "no mic").toString()
+                        + ", n=" + name.toString() + ", sb=" + isInitialStickyBroadcast
+            )
             hasWiredHeadset = (state == STATE_PLUGGED)
             updateAudioDeviceState()
         }

@@ -3,11 +3,9 @@ package com.monitor.app.classes
 import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.gson.Gson
 import com.monitor.app.Constants
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import org.json.JSONObject
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
 

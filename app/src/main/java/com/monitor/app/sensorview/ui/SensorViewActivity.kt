@@ -1,24 +1,15 @@
 package com.monitor.app.sensorview.ui
 
-import android.Manifest
 import android.app.Application
-import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.monitor.app.Constants
 import com.monitor.app.R
 import com.monitor.app.classes.*
@@ -45,6 +36,12 @@ fun VideoView(
     userId: String,
     sensorId: String
 ) {
+    lateinit var rtcClient: RTCClient
+    lateinit var signallingClient: SignalingClient
+
+    BackHandler {
+        rtcClient.endCall(userId, sensorId)
+    }
     KeepScreenOn()
     Scaffold {
         AndroidView(
@@ -55,8 +52,6 @@ fun VideoView(
                     LayoutInflater.from(context).inflate(R.layout.webrtc_video_view, null, false)
                 val videoView = view.findViewById<SurfaceViewRenderer>(R.id.video_view)
 
-                lateinit var rtcClient: RTCClient
-                lateinit var signallingClient: SignalingClient
 //    val audioManager by lazy { RTCAudioManager.create(LocalContext.current) }
 
                 val sdpObserver = object : AppSdpObserver() {

@@ -241,8 +241,8 @@ class RTCClient(
         peerConnection?.addIceCandidate(iceCandidate)
     }
 
-    fun endCall(meetingID: String) {
-        db.collection("calls").document(meetingID).collection("candidates")
+    fun endCall(userID: String, sensorID: String) {
+        db.collection(userID).document(sensorID).collection("candidates")
             .get().addOnSuccessListener {
                 val iceCandidateArray: MutableList<IceCandidate> = mutableListOf()
                 for (dataSnapshot in it) {
@@ -269,7 +269,7 @@ class RTCClient(
         val endCall = hashMapOf(
             "type" to "END_CALL"
         )
-        db.collection("calls").document(meetingID)
+        db.collection(userID).document(sensorID)
             .update(endCall as Map<String, *>)
             .addOnSuccessListener {
                 Log.d(TAG, "DocumentSnapshot added")

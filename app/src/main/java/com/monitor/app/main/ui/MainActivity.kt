@@ -1,6 +1,5 @@
 package com.monitor.app.main.ui
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,21 +8,17 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.monitor.app.main.TestViewModel
-import com.monitor.app.classes.SampleData
-import com.monitor.app.classes.SensorInfo
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.navigation.NavHostController
 import com.monitor.app.Constants
+import com.monitor.app.classes.SampleData
+import com.monitor.app.classes.SensorInfo
+import com.monitor.app.main.TestViewModel
 
 @Composable
 fun SensorsScreen(navigator: NavHostController, viewModel: TestViewModel = viewModel()) {
@@ -67,7 +62,7 @@ fun SensorsScreen(navigator: NavHostController, viewModel: TestViewModel = viewM
                     .padding(it)
             ) {
                 Text(text = "Sensors", style = MaterialTheme.typography.h1)
-                SensorList(sensors = sensors) {id ->
+                SensorList(sensors = sensors) { id ->
                     val user = "user-1"
                     navigator.navigate("sensorView/$user/$id")
                 }
@@ -87,7 +82,7 @@ fun SensorsScreen(navigator: NavHostController, viewModel: TestViewModel = viewM
                             name = it
                         },
                         placeholder = { Text("Living room, yard, etc...") },
-                        label = {Text("Name")},
+                        label = { Text("Name") },
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
                     )
                     TextField(
@@ -96,7 +91,7 @@ fun SensorsScreen(navigator: NavHostController, viewModel: TestViewModel = viewM
                             info = it
                         },
                         placeholder = { Text("Behind garage door, etc...") },
-                        label = {Text("Info")},
+                        label = { Text("Info") },
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
                     )
                 }

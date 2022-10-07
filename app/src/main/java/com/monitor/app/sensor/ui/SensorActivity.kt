@@ -26,7 +26,6 @@ import com.monitor.app.sensor.SensorSendViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.webrtc.*
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun SensorSendScreen(
     userId: String,
@@ -160,7 +159,8 @@ fun VideoView(application: Application, userId: String, sensorId: String) {
 
                     rtcClient.initSurfaceView(localView)
                     rtcClient.startLocalVideoCapture(localView)
-                    signallingClient = SignalingClient(userId, sensorId, createSignallingClientListener())
+                    signallingClient =
+                        SignalingClient(userId, sensorId, createSignallingClientListener())
                     rtcClient.call(sdpObserver, userId, sensorId)
                 }
 
