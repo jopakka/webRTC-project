@@ -3,7 +3,6 @@ package com.monitor.app.sensorview.ui
 import android.app.Application
 import android.util.Log
 import android.view.LayoutInflater
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
@@ -13,12 +12,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.monitor.app.Constants
 import com.monitor.app.R
 import com.monitor.app.classes.*
-import com.monitor.app.sensor.ui.KeepScreenOn
+import com.monitor.app.sensorsend.ui.KeepScreenOn
 import com.monitor.app.sensorview.SensorViewViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.webrtc.*
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun SensorViewScreen(
     userId: String,
@@ -34,14 +32,11 @@ fun SensorViewScreen(
 @Composable
 fun VideoView(
     userId: String,
-    sensorId: String
+    sensorId: String,
 ) {
     lateinit var rtcClient: RTCClient
     lateinit var signallingClient: SignalingClient
 
-    BackHandler {
-        rtcClient.endCall(userId, sensorId)
-    }
     KeepScreenOn()
     Scaffold {
         AndroidView(

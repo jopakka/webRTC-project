@@ -18,10 +18,10 @@ import androidx.navigation.NavHostController
 import com.monitor.app.Constants
 import com.monitor.app.classes.SampleData
 import com.monitor.app.classes.SensorInfo
-import com.monitor.app.main.TestViewModel
+import com.monitor.app.main.MainViewModel
 
 @Composable
-fun SensorsScreen(navigator: NavHostController, viewModel: TestViewModel = viewModel()) {
+fun SensorsScreen(navigator: NavHostController, viewModel: MainViewModel = viewModel()) {
     val sensors = viewModel.sensors
     var name by remember { mutableStateOf("") }
     var info by remember { mutableStateOf("") }

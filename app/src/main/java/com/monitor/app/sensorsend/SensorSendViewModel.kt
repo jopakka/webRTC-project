@@ -1,4 +1,4 @@
-package com.monitor.app.sensor
+package com.monitor.app.sensorsend
 
 import android.Manifest
 import android.content.Context

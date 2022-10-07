@@ -1,4 +1,4 @@
-package com.monitor.app.sensor.ui
+package com.monitor.app.sensorsend.ui
 
 import android.Manifest
 import android.app.Application
@@ -22,7 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.monitor.app.Constants
 import com.monitor.app.R
 import com.monitor.app.classes.*
-import com.monitor.app.sensor.SensorSendViewModel
+import com.monitor.app.sensorsend.SensorSendViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.webrtc.*
 
@@ -108,6 +108,10 @@ fun VideoView(application: Application, userId: String, sensorId: String) {
 
                     override fun onCallEnded() {
                         Log.d(TAG, "onCallEnded")
+                        if (!Constants.isCallEnded) {
+                            Constants.isCallEnded = true
+                            rtcClient.endCall(userId, sensorId)
+                        }
                     }
                 }
 

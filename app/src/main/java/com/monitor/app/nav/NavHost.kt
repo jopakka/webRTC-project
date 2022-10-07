@@ -7,7 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.monitor.app.main.ui.SensorsScreen
-import com.monitor.app.sensor.ui.SensorSendScreen
+import com.monitor.app.sensorsend.ui.SensorSendScreen
 import com.monitor.app.sensorview.ui.SensorViewScreen
 
 @Composable
