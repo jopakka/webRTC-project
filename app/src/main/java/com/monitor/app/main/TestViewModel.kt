@@ -44,7 +44,6 @@ class TestViewModel : ViewModel() {
                         Log.w(TAG, "${e.message}")
                     }
                 }
-                Log.d(TAG, sensors.toString())
             }
         } catch (e: Error) {
             Log.e(TAG, "${e.message}")

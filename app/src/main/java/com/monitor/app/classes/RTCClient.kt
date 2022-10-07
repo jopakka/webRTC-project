@@ -112,6 +112,7 @@ class RTCClient(
     }
 
     private fun PeerConnection.call(sdpObserver: SdpObserver, userID: String, sensorID: String) {
+        Log.d(TAG, "Calling")
         val constraints = MediaConstraints().apply {
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
         }
@@ -124,7 +125,7 @@ class RTCClient(
                     }
 
                     override fun onSetSuccess() {
-                        Log.d(TAG, "onSetSuccess")
+                        Log.d(TAG, "onSetSuccess start")
                         val offer = hashMapOf(
                             "sdp" to desc?.description,
                             "type" to desc?.type
@@ -162,6 +163,7 @@ class RTCClient(
     }
 
     private fun PeerConnection.answer(sdpObserver: SdpObserver, userID: String, sensorID: String) {
+        Log.d(TAG, "Answering")
         val constraints = MediaConstraints().apply {
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
         }
@@ -212,8 +214,9 @@ class RTCClient(
         peerConnection?.answer(sdpObserver, userID, sensorID)
 
     fun onRemoteSessionReceived(sessionDescription: SessionDescription) {
+        Log.d(TAG, "onRemoteSessionReceived")
+        Log.d(TAG, "sessionDescription=${sessionDescription.type}")
         remoteSessionDescription = sessionDescription
-        Log.d(TAG, "peerConnection: ${peerConnection?.connectionState()}")
         peerConnection?.setRemoteDescription(object : SdpObserver {
             override fun onSetFailure(p0: String?) {
                 Log.e(TAG, "onSetFailure-setRemoteDescription: $p0")
@@ -244,21 +247,19 @@ class RTCClient(
                 val iceCandidateArray: MutableList<IceCandidate> = mutableListOf()
                 for (dataSnapshot in it) {
                     if (dataSnapshot.contains("type") && dataSnapshot["type"] == "offerCandidate") {
-                        val sensor = dataSnapshot
                         iceCandidateArray.add(
                             IceCandidate(
-                                sensor["sdpMid"].toString(),
-                                Math.toIntExact(sensor["sdpMLineIndex"] as Long),
-                                sensor["sdp"].toString()
+                                dataSnapshot["sdpMid"].toString(),
+                                Math.toIntExact(dataSnapshot["sdpMLineIndex"] as Long),
+                                dataSnapshot["sdp"].toString()
                             )
                         )
                     } else if (dataSnapshot.contains("type") && dataSnapshot["type"] == "answerCandidate") {
-                        val answerCandidate = dataSnapshot
                         iceCandidateArray.add(
                             IceCandidate(
-                                answerCandidate["sdpMid"].toString(),
-                                Math.toIntExact(answerCandidate["sdpMLineIndex"] as Long),
-                                answerCandidate["sdp"].toString()
+                                dataSnapshot["sdpMid"].toString(),
+                                Math.toIntExact(dataSnapshot["sdpMLineIndex"] as Long),
+                                dataSnapshot["sdp"].toString()
                             )
                         )
                     }

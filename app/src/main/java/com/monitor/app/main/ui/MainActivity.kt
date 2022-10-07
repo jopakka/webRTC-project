@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.navigation.NavHostController
+import com.monitor.app.Constants
 
 @Composable
 fun SensorsScreen(navigator: NavHostController, viewModel: TestViewModel = viewModel()) {
@@ -30,6 +31,9 @@ fun SensorsScreen(navigator: NavHostController, viewModel: TestViewModel = viewM
     var name by remember { mutableStateOf("") }
     var info by remember { mutableStateOf("") }
     val openDialog = remember { mutableStateOf(false) }
+
+    Constants.isIntiatedNow = true
+    Constants.isCallEnded = true
 
     val fabOnClick = {
         openDialog.value = true

@@ -55,7 +55,7 @@ class SignalingClient(
 
                     if (snapshot != null && snapshot.exists()) {
                         val data = snapshot.data
-                        Log.d(TAG, "data=$data")
+                        Log.d(TAG, "type=${data?.get("type")}")
                         if (data?.containsKey("type")!! &&
                             data.getValue("type").toString() == "OFFER"
                         ) {
@@ -95,9 +95,9 @@ class SignalingClient(
 
                     if (querysnapshot != null && !querysnapshot.isEmpty) {
                         for (dataSnapShot in querysnapshot) {
-
                             val data = dataSnapShot.data
-                            if (SDPtype == "Offer" && data.containsKey("type") && data.get("type") == "offerCandidate") {
+                            Log.d(TAG, "candidates type=${data["type"]}")
+                            if (SDPtype == "Offer" && data.containsKey("type") && data["type"] == "offerCandidate") {
                                 listener.onIceCandidateReceived(
                                     IceCandidate(
                                         data["sdpMid"].toString(),
@@ -105,7 +105,7 @@ class SignalingClient(
                                         data["sdpCandidate"].toString()
                                     )
                                 )
-                            } else if (SDPtype == "Answer" && data.containsKey("type") && data.get("type") == "answerCandidate") {
+                            } else if (SDPtype == "Answer" && data.containsKey("type") && data["type"] == "answerCandidate") {
                                 listener.onIceCandidateReceived(
                                     IceCandidate(
                                         data["sdpMid"].toString(),

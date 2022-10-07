@@ -2,6 +2,7 @@ package com.monitor.app.sensorview.ui
 
 import android.Manifest
 import android.app.Application
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -18,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.monitor.app.Constants
 import com.monitor.app.R
 import com.monitor.app.classes.*
 import com.monitor.app.sensor.ui.KeepScreenOn
@@ -62,7 +64,6 @@ fun VideoView(
                         super.onCreateSuccess(p0)
                         Log.d(TAG, "sdpObserver onCreateSuccess")
                     }
-
                 }
 
                 fun createSignallingClientListener() = object : SignalingClientListener {
@@ -73,12 +74,14 @@ fun VideoView(
                     override fun onOfferReceived(description: SessionDescription) {
                         Log.d(TAG, "onOfferReceived")
                         rtcClient.onRemoteSessionReceived(description)
+                        Constants.isIntiatedNow = false
                         rtcClient.answer(sdpObserver, userId, sensorId)
                     }
 
                     override fun onAnswerReceived(description: SessionDescription) {
                         Log.d(TAG, "onAnswerReceived")
                         rtcClient.onRemoteSessionReceived(description)
+                        Constants.isIntiatedNow = false
                     }
 
                     override fun onIceCandidateReceived(iceCandidate: IceCandidate) {
@@ -88,6 +91,10 @@ fun VideoView(
 
                     override fun onCallEnded() {
                         Log.d(TAG, "onCallEnded")
+                        if (!Constants.isCallEnded) {
+                            Constants.isCallEnded = true
+//                            rtcClient.endCall(meetingID)
+                        }
                     }
                 }
 
