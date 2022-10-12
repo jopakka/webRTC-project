@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Application
 import android.util.Log
 import android.view.LayoutInflater
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
@@ -12,13 +13,13 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Adjust
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.monitor.app.Constants
 import com.monitor.app.R
 import com.monitor.app.classes.*
@@ -28,6 +29,7 @@ import org.webrtc.*
 
 @Composable
 fun SensorSendScreen(
+    navController: NavHostController,
     userId: String,
     sensorId: String,
     viewModel: SensorSendViewModel = viewModel()
@@ -43,26 +45,30 @@ fun SensorSendScreen(
             viewModel.setHasPermission(granted)
         })
 
+    val navBack = {
+        navController.navigateUp()
+    }
+
     viewModel.checkAndRequestPermissions(LocalContext.current, permissions, launcher)
 
     if (hasPermissions.value) {
-        VideoView(LocalContext.current.applicationContext as Application, userId, sensorId)
+        VideoView(LocalContext.current.applicationContext as Application, userId, sensorId, navBack)
     }
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
-fun VideoView(application: Application, userId: String, sensorId: String) {
+fun VideoView(application: Application, userId: String, sensorId: String, navBack: () -> Boolean) {
     val TAG = "SensorSendScreen VV"
 
-    lateinit var rtcClient: RTCClient
-    lateinit var signallingClient: SignalingClient
+    var rtcClient by remember { mutableStateOf<RTCClient?>(null) }
+    var signallingClient by remember { mutableStateOf<SignalingClient?>(null) }
 
     KeepScreenOn()
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                rtcClient.switchCamera()
+                rtcClient?.switchCamera()
             }) {
                 Icon(Icons.Filled.Adjust, null)
             }
@@ -90,28 +96,29 @@ fun VideoView(application: Application, userId: String, sensorId: String) {
 
                     override fun onOfferReceived(description: SessionDescription) {
                         Log.d(TAG, "onOfferReceived")
-                        rtcClient.onRemoteSessionReceived(description)
+                        rtcClient?.onRemoteSessionReceived(description)
                         Constants.isIntiatedNow = false
-                        rtcClient.answer(sdpObserver, userId, sensorId)
+                        rtcClient?.answer(sdpObserver, userId, sensorId)
                     }
 
                     override fun onAnswerReceived(description: SessionDescription) {
                         Log.d(TAG, "onAnswerReceived")
-                        rtcClient.onRemoteSessionReceived(description)
+                        rtcClient?.onRemoteSessionReceived(description)
                         Constants.isIntiatedNow = false
                     }
 
                     override fun onIceCandidateReceived(iceCandidate: IceCandidate) {
                         Log.d(TAG, "onIceCandidateReceived")
-                        rtcClient.addIceCandidate(iceCandidate)
+                        rtcClient?.addIceCandidate(iceCandidate)
                     }
 
                     override fun onCallEnded() {
                         Log.d(TAG, "onCallEnded")
-                        if (!Constants.isCallEnded) {
-                            Constants.isCallEnded = true
-                            rtcClient.endCall(userId, sensorId)
-                        }
+                        rtcClient?.endCall(userId, sensorId, true)
+//                        if (!Constants.isCallEnded) {
+//                            Constants.isCallEnded = true
+//                            rtcClient?.endCall(userId, sensorId)
+//                        }
                     }
                 }
 
@@ -122,8 +129,8 @@ fun VideoView(application: Application, userId: String, sensorId: String) {
                             override fun onIceCandidate(p0: IceCandidate?) {
                                 super.onIceCandidate(p0)
                                 Log.d(TAG, "onIceCandidate: candidate=$p0")
-                                signallingClient.sendIceCandidate(p0, true)
-                                rtcClient.addIceCandidate(p0)
+                                signallingClient?.sendIceCandidate(p0, true)
+                                rtcClient?.addIceCandidate(p0)
                             }
 
                             override fun onAddStream(p0: MediaStream?) {
@@ -161,11 +168,11 @@ fun VideoView(application: Application, userId: String, sensorId: String) {
                         }
                     )
 
-                    rtcClient.initSurfaceView(localView)
-                    rtcClient.startLocalVideoCapture(localView)
+                    rtcClient?.initSurfaceView(localView)
+                    rtcClient?.startLocalVideoCapture(localView)
                     signallingClient =
                         SignalingClient(userId, sensorId, createSignallingClientListener())
-                    rtcClient.call(sdpObserver, userId, sensorId)
+                    rtcClient?.call(sdpObserver, userId, sensorId)
                 }
 
                 onCameraAndAudioPermissionGranted(application)
@@ -173,6 +180,11 @@ fun VideoView(application: Application, userId: String, sensorId: String) {
             },
             modifier = Modifier.padding(it)
         )
+    }
+
+    BackHandler {
+        rtcClient?.endCall(userId, sensorId, false)
+        navBack()
     }
 }
 
