@@ -3,12 +3,14 @@ package com.monitor.app.sensorview.ui
 import android.app.Application
 import android.util.Log
 import android.view.LayoutInflater
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.monitor.app.Constants
 import com.monitor.app.R
 import com.monitor.app.classes.*
@@ -19,13 +21,18 @@ import org.webrtc.*
 
 @Composable
 fun SensorViewScreen(
+    navController: NavHostController,
     userId: String,
     sensorId: String,
     viewModel: SensorViewViewModel = viewModel()
 ) {
     Log.d("SensorViewScreen", "userId=$userId, sensorId=$sensorId")
 
-    VideoView(userId, sensorId)
+    val navBack = {
+        navController.navigateUp()
+    }
+
+    VideoView(userId, sensorId, navBack)
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -33,9 +40,13 @@ fun SensorViewScreen(
 fun VideoView(
     userId: String,
     sensorId: String,
+    navBack: () -> Boolean,
 ) {
-    lateinit var rtcClient: RTCClient
-    lateinit var signallingClient: SignalingClient
+
+//    lateinit var rtcClient: RTCClient
+//    lateinit var signallingClient: SignalingClient
+    var rtcClient by remember { mutableStateOf<RTCClient?>(null) }
+    var signallingClient by remember { mutableStateOf<SignalingClient?>(null) }
 
     KeepScreenOn()
     Scaffold {
@@ -63,20 +74,20 @@ fun VideoView(
 
                     override fun onOfferReceived(description: SessionDescription) {
                         Log.d(TAG, "onOfferReceived")
-                        rtcClient.onRemoteSessionReceived(description)
+                        rtcClient?.onRemoteSessionReceived(description)
                         Constants.isIntiatedNow = false
-                        rtcClient.answer(sdpObserver, userId, sensorId)
+                        rtcClient?.answer(sdpObserver, userId, sensorId)
                     }
 
                     override fun onAnswerReceived(description: SessionDescription) {
                         Log.d(TAG, "onAnswerReceived")
-                        rtcClient.onRemoteSessionReceived(description)
+                        rtcClient?.onRemoteSessionReceived(description)
                         Constants.isIntiatedNow = false
                     }
 
                     override fun onIceCandidateReceived(iceCandidate: IceCandidate) {
                         Log.d(TAG, "onIceCandidateReceived")
-                        rtcClient.addIceCandidate(iceCandidate)
+                        rtcClient?.addIceCandidate(iceCandidate)
                     }
 
                     override fun onCallEnded() {
@@ -95,8 +106,8 @@ fun VideoView(
                             override fun onIceCandidate(p0: IceCandidate?) {
                                 super.onIceCandidate(p0)
                                 Log.d(TAG, "onIceCandidate: candidate=$p0")
-                                signallingClient.sendIceCandidate(p0, false)
-                                rtcClient.addIceCandidate(p0)
+                                signallingClient?.sendIceCandidate(p0, false)
+                                rtcClient?.addIceCandidate(p0)
                             }
 
                             override fun onAddStream(p0: MediaStream?) {
@@ -141,10 +152,15 @@ fun VideoView(
 
                 onCameraAndAudioPermissionGranted(context.applicationContext as Application)
 
-                rtcClient.initSurfaceView(videoView)
+                rtcClient?.initSurfaceView(videoView)
                 view
             },
             modifier = Modifier.padding(it)
         )
+    }
+
+    BackHandler {
+        rtcClient?.endCall(userId, sensorId, false)
+        navBack()
     }
 }

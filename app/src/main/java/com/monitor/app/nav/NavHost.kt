@@ -24,12 +24,14 @@ fun AppNavHost(
         }
         composable("sensorSend/{userID}/{sensorID}") {
             SensorSendScreen(
+                navController,
                 it.arguments?.getString("userID")!!,
                 it.arguments?.getString("sensorID")!!,
             )
         }
         composable("sensorView/{userID}/{sensorID}") {
             SensorViewScreen(
+                navController,
                 it.arguments?.getString("userID")!!,
                 it.arguments?.getString("sensorID")!!,
             )

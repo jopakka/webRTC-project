@@ -115,6 +115,7 @@ class RTCClient(
         Log.d(TAG, "Calling")
         val constraints = MediaConstraints().apply {
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
+            mandatory.add(MediaConstraints.KeyValuePair("IceRestart", "true"))
         }
 
         createOffer(object : SdpObserver by sdpObserver {
@@ -166,6 +167,7 @@ class RTCClient(
         Log.d(TAG, "Answering")
         val constraints = MediaConstraints().apply {
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
+            mandatory.add(MediaConstraints.KeyValuePair("IceRestart", "true"))
         }
         createAnswer(object : SdpObserver by sdpObserver {
             override fun onCreateSuccess(desc: SessionDescription?) {
@@ -241,7 +243,17 @@ class RTCClient(
         peerConnection?.addIceCandidate(iceCandidate)
     }
 
-    fun endCall(userID: String, sensorID: String) {
+    fun endCall(userID: String, sensorID: String, reCall: Boolean) {
+        if (reCall) {
+            val sdpObserver = object : AppSdpObserver() {
+                override fun onCreateSuccess(p0: SessionDescription?) {
+                    super.onCreateSuccess(p0)
+                    Log.d(TAG, "onCreateSuccess reCreated send")
+                }
+            }
+            call(sdpObserver, userID, sensorID)
+            return
+        }
         db.collection(userID).document(sensorID).collection("candidates")
             .get().addOnSuccessListener {
                 val iceCandidateArray: MutableList<IceCandidate> = mutableListOf()
