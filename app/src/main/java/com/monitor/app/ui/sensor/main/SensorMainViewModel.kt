@@ -1,4 +1,4 @@
-package com.monitor.app.sensorsend
+package com.monitor.app.ui.sensor.main
 
 import android.Manifest
 import android.content.Context
@@ -10,7 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 
-class SensorSendViewModel : ViewModel() {
+class SensorMainViewModel : ViewModel() {
     companion object {
         private const val CAMERA_PERMISSION = Manifest.permission.CAMERA
         private const val AUDIO_PERMISSION = Manifest.permission.RECORD_AUDIO

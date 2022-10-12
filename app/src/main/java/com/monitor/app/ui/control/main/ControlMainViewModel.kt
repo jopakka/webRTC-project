@@ -1,4 +1,4 @@
-package com.monitor.app.main
+package com.monitor.app.ui.control.main
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
@@ -6,9 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.monitor.app.classes.SensorInfo
+import com.monitor.app.data.model.SensorInfo
 
-class MainViewModel : ViewModel() {
+class ControlMainViewModel : ViewModel() {
     private val TAG = "TestViewModel"
     private val firestore = Firebase.firestore
     private val _sensors = mutableStateMapOf<String, SensorInfo>()

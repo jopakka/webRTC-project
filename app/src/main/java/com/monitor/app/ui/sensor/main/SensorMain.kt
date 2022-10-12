@@ -1,69 +1,92 @@
-package com.monitor.app.sensorview.ui
+package com.monitor.app.ui.sensor.main
 
+import android.Manifest
 import android.app.Application
 import android.util.Log
 import android.view.LayoutInflater
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.monitor.app.Constants
+import com.monitor.app.core.constants.Constants
 import com.monitor.app.R
-import com.monitor.app.classes.*
-import com.monitor.app.sensorsend.ui.KeepScreenOn
-import com.monitor.app.sensorview.SensorViewViewModel
+import com.monitor.app.core.components.KeepScreenOn
+import com.monitor.app.data.rtcclient.*
+import com.monitor.app.data.signalingclient.SignalingClient
+import com.monitor.app.data.signalingclient.SignalingClientListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.webrtc.*
 
 @Composable
-fun SensorViewScreen(
+fun SensorMainScreen(
     navController: NavHostController,
     userId: String,
     sensorId: String,
-    viewModel: SensorViewViewModel = viewModel()
+    viewModel: SensorMainViewModel = viewModel()
 ) {
-    Log.d("SensorViewScreen", "userId=$userId, sensorId=$sensorId")
+    KeepScreenOn()
+    Log.d("SensorSendScreen", "userId=$userId, sensorId=$sensorId")
+    val permissions = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+    val hasPermissions = viewModel.hasPermissions
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = {
+            val granted = it.values.reduce { acc, next -> acc && next }
+            viewModel.setHasPermission(granted)
+        })
 
     val navBack = {
         navController.navigateUp()
     }
 
-    VideoView(userId, sensorId, navBack)
+    viewModel.checkAndRequestPermissions(LocalContext.current, permissions, launcher)
+
+    if (hasPermissions.value) {
+        VideoView(LocalContext.current.applicationContext as Application, userId, sensorId, navBack)
+    }
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
-fun VideoView(
-    userId: String,
-    sensorId: String,
-    navBack: () -> Boolean,
-) {
+fun VideoView(application: Application, userId: String, sensorId: String, navBack: () -> Boolean) {
+    val TAG = "SensorSendScreen"
 
-//    lateinit var rtcClient: RTCClient
-//    lateinit var signallingClient: SignalingClient
     var rtcClient by remember { mutableStateOf<RTCClient?>(null) }
     var signallingClient by remember { mutableStateOf<SignalingClient?>(null) }
 
-    KeepScreenOn()
-    Scaffold {
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                rtcClient?.switchCamera()
+            }) {
+                Icon(Icons.Filled.Adjust, null)
+            }
+        }
+    ) {
         AndroidView(
             factory = { context ->
-                val TAG = "SensorViewScreen"
-
                 val view =
                     LayoutInflater.from(context).inflate(R.layout.webrtc_video_view, null, false)
-                val videoView = view.findViewById<SurfaceViewRenderer>(R.id.video_view)
+                val localView = view.findViewById<SurfaceViewRenderer>(R.id.video_view)
 
 //    val audioManager by lazy { RTCAudioManager.create(LocalContext.current) }
 
                 val sdpObserver = object : AppSdpObserver() {
                     override fun onCreateSuccess(p0: SessionDescription?) {
                         super.onCreateSuccess(p0)
-                        Log.d(TAG, "sdpObserver onCreateSuccess")
+                        Log.d(TAG, "onCreateSuccess send")
                     }
                 }
 
@@ -92,10 +115,11 @@ fun VideoView(
 
                     override fun onCallEnded() {
                         Log.d(TAG, "onCallEnded")
-                        if (!Constants.isCallEnded) {
-                            Constants.isCallEnded = true
-//                            rtcClient.endCall(meetingID)
-                        }
+                        rtcClient?.endCall(userId, sensorId, true)
+//                        if (!Constants.isCallEnded) {
+//                            Constants.isCallEnded = true
+//                            rtcClient?.endCall(userId, sensorId)
+//                        }
                     }
                 }
 
@@ -106,14 +130,13 @@ fun VideoView(
                             override fun onIceCandidate(p0: IceCandidate?) {
                                 super.onIceCandidate(p0)
                                 Log.d(TAG, "onIceCandidate: candidate=$p0")
-                                signallingClient?.sendIceCandidate(p0, false)
+                                signallingClient?.sendIceCandidate(p0, true)
                                 rtcClient?.addIceCandidate(p0)
                             }
 
                             override fun onAddStream(p0: MediaStream?) {
                                 super.onAddStream(p0)
                                 Log.d(TAG, "onAddStream: $p0")
-                                p0?.videoTracks?.get(0)?.addSink(videoView)
                             }
 
                             override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {
@@ -146,13 +169,14 @@ fun VideoView(
                         }
                     )
 
+                    rtcClient?.initSurfaceView(localView)
+                    rtcClient?.startLocalVideoCapture(localView)
                     signallingClient =
                         SignalingClient(userId, sensorId, createSignallingClientListener())
+                    rtcClient?.call(sdpObserver, userId, sensorId)
                 }
 
-                onCameraAndAudioPermissionGranted(context.applicationContext as Application)
-
-                rtcClient?.initSurfaceView(videoView)
+                onCameraAndAudioPermissionGranted(application)
                 view
             },
             modifier = Modifier.padding(it)

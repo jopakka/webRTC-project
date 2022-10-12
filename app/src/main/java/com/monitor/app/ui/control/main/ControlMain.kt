@@ -1,9 +1,8 @@
-package com.monitor.app.main.ui
+package com.monitor.app.ui.control.main
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -11,17 +10,14 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.monitor.app.Constants
-import com.monitor.app.classes.SampleData
-import com.monitor.app.classes.SensorInfo
-import com.monitor.app.main.MainViewModel
+import com.monitor.app.core.components.SensorList
+import com.monitor.app.core.constants.Constants
 
 @Composable
-fun SensorsScreen(navigator: NavHostController, viewModel: MainViewModel = viewModel()) {
+fun ControlMainScreen(navigator: NavHostController, viewModel: ControlMainViewModel = viewModel()) {
     val sensors = viewModel.sensors
     var name by remember { mutableStateOf("") }
     var info by remember { mutableStateOf("") }
@@ -108,42 +104,4 @@ fun SensorsScreen(navigator: NavHostController, viewModel: MainViewModel = viewM
             }
         )
     }
-}
-
-@Preview
-@Composable
-fun PreviewSensorList() {
-    SensorList(SampleData.sensors) {}
-}
-
-@Composable
-fun SensorList(sensors: List<SensorInfo>, itemOnClick: (id: String) -> Unit) {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        LazyColumn {
-            items(sensors) { sensor ->
-                ListItem(sensor, itemOnClick)
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun ListItem(sensorInfo: SensorInfo, onClick: (id: String) -> Unit) {
-    Card(modifier = Modifier
-        .padding(all = 8.dp)
-        .fillMaxWidth(),
-        onClick = { onClick(sensorInfo.id ?: "") }) {
-        Column(modifier = Modifier.padding(all = 4.dp)) {
-            Text(text = sensorInfo.name, style = MaterialTheme.typography.subtitle1)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = sensorInfo.info, style = MaterialTheme.typography.subtitle1)
-        }
-    }
-}
-
-@Preview
-@Composable
-fun PreviewListItem() {
-    ListItem(SensorInfo("Testi", "Jee")) {}
 }

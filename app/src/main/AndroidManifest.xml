@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WebRTCSample">
-        <activity android:name="com.monitor.app.main.MainActivity"
+        <activity android:name="com.monitor.app.ui.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.FullScreen"
             android:exported="true">

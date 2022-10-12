@@ -1,4 +1,4 @@
-package com.monitor.app.classes
+package com.monitor.app.data.rtcclient
 
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription

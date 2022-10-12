@@ -1,4 +1,4 @@
-package com.monitor.app.classes
+package com.monitor.app.data.model
 
 class SampleData {
     companion object {

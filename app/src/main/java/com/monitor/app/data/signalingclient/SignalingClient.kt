@@ -1,9 +1,9 @@
-package com.monitor.app.classes
+package com.monitor.app.data.signalingclient
 
 import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.monitor.app.Constants
+import com.monitor.app.core.constants.Constants
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import org.webrtc.IceCandidate

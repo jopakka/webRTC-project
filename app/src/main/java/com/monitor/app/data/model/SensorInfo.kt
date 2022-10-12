@@ -1,4 +1,4 @@
-package com.monitor.app.classes
+package com.monitor.app.data.model
 
 data class SensorInfo(
     val name: String,
