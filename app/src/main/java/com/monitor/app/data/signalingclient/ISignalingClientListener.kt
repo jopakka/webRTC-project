@@ -3,7 +3,7 @@ package com.monitor.app.data.signalingclient
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
 
-interface SignalingClientListener {
+interface ISignalingClientListener {
     fun onConnectionEstablished()
     fun onOfferReceived(description: SessionDescription)
     fun onAnswerReceived(description: SessionDescription)

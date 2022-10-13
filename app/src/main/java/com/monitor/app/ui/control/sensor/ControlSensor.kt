@@ -1,167 +1,32 @@
 package com.monitor.app.ui.control.sensor
 
 import android.app.Application
-import android.util.Log
-import android.view.LayoutInflater
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.monitor.app.R
 import com.monitor.app.core.components.KeepScreenOn
-import com.monitor.app.core.constants.Constants
-import com.monitor.app.data.rtcclient.AppSdpObserver
-import com.monitor.app.data.rtcclient.PeerConnectionObserver
-import com.monitor.app.data.rtcclient.RTCClient
-import com.monitor.app.data.signalingclient.SignalingClient
-import com.monitor.app.data.signalingclient.SignalingClientListener
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.webrtc.*
+import com.monitor.app.core.components.WebRTCVideoView
 
 @Composable
 fun ControlSensorScreen(
     navController: NavHostController,
     userId: String,
     sensorId: String,
-    viewModel: ControlSensorViewModel = viewModel()
+    viewModel: ControlSensorViewModel = viewModel(
+        factory = ControlSensorViewModelFactory(userId, sensorId)
+    )
 ) {
     KeepScreenOn()
-    Log.d("SensorViewScreen", "userId=$userId, sensorId=$sensorId")
+    val application = LocalContext.current.applicationContext as Application
 
-    val navBack = {
-        navController.navigateUp()
-    }
-
-    VideoView(userId, sensorId, navBack)
-}
-
-@OptIn(ExperimentalCoroutinesApi::class)
-@Composable
-fun VideoView(
-    userId: String,
-    sensorId: String,
-    navBack: () -> Boolean,
-) {
-
-    var rtcClient by remember { mutableStateOf<RTCClient?>(null) }
-    var signallingClient by remember { mutableStateOf<SignalingClient?>(null) }
-
-    Scaffold {
-        AndroidView(
-            factory = { context ->
-                val TAG = "SensorViewScreen"
-
-                val view =
-                    LayoutInflater.from(context).inflate(R.layout.webrtc_video_view, null, false)
-                val videoView = view.findViewById<SurfaceViewRenderer>(R.id.video_view)
-
-//    val audioManager by lazy { RTCAudioManager.create(LocalContext.current) }
-
-                val sdpObserver = object : AppSdpObserver() {
-                    override fun onCreateSuccess(p0: SessionDescription?) {
-                        super.onCreateSuccess(p0)
-                        Log.d(TAG, "sdpObserver onCreateSuccess")
-                    }
-                }
-
-                fun createSignallingClientListener() = object : SignalingClientListener {
-                    override fun onConnectionEstablished() {
-                        Log.d(TAG, "onConnectionEstablished")
-                    }
-
-                    override fun onOfferReceived(description: SessionDescription) {
-                        Log.d(TAG, "onOfferReceived")
-                        rtcClient?.onRemoteSessionReceived(description)
-                        Constants.isIntiatedNow = false
-                        rtcClient?.answer(sdpObserver, userId, sensorId)
-                    }
-
-                    override fun onAnswerReceived(description: SessionDescription) {
-                        Log.d(TAG, "onAnswerReceived")
-                        rtcClient?.onRemoteSessionReceived(description)
-                        Constants.isIntiatedNow = false
-                    }
-
-                    override fun onIceCandidateReceived(iceCandidate: IceCandidate) {
-                        Log.d(TAG, "onIceCandidateReceived")
-                        rtcClient?.addIceCandidate(iceCandidate)
-                    }
-
-                    override fun onCallEnded() {
-                        Log.d(TAG, "onCallEnded")
-                        if (!Constants.isCallEnded) {
-                            Constants.isCallEnded = true
-//                            rtcClient.endCall(meetingID)
-                        }
-                    }
-                }
-
-                fun onCameraAndAudioPermissionGranted(application: Application) {
-                    rtcClient = RTCClient(
-                        application,
-                        object : PeerConnectionObserver() {
-                            override fun onIceCandidate(p0: IceCandidate?) {
-                                super.onIceCandidate(p0)
-                                Log.d(TAG, "onIceCandidate: candidate=$p0")
-                                signallingClient?.sendIceCandidate(p0, false)
-                                rtcClient?.addIceCandidate(p0)
-                            }
-
-                            override fun onAddStream(p0: MediaStream?) {
-                                super.onAddStream(p0)
-                                Log.d(TAG, "onAddStream: $p0")
-                                p0?.videoTracks?.get(0)?.addSink(videoView)
-                            }
-
-                            override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {
-                                Log.d(TAG, "onIceConnectionChange: $p0")
-                            }
-
-                            override fun onIceConnectionReceivingChange(p0: Boolean) {
-                                Log.d(TAG, "onIceConnectionReceivingChange: $p0")
-                            }
-
-                            override fun onConnectionChange(newState: PeerConnection.PeerConnectionState?) {
-                                Log.d(TAG, "onConnectionChange: $newState")
-                            }
-
-                            override fun onDataChannel(p0: DataChannel?) {
-                                Log.d(TAG, "onDataChannel: $p0")
-                            }
-
-                            override fun onStandardizedIceConnectionChange(newState: PeerConnection.IceConnectionState?) {
-                                Log.d(TAG, "onStandardizedIceConnectionChange: $newState")
-                            }
-
-                            override fun onAddTrack(p0: RtpReceiver?, p1: Array<out MediaStream>?) {
-                                Log.d(TAG, "onAddTrack: $p0 \n $p1")
-                            }
-
-                            override fun onTrack(transceiver: RtpTransceiver?) {
-                                Log.d(TAG, "onTrack: $transceiver")
-                            }
-                        }
-                    )
-
-                    signallingClient =
-                        SignalingClient(userId, sensorId, createSignallingClientListener())
-                }
-
-                onCameraAndAudioPermissionGranted(context.applicationContext as Application)
-
-                rtcClient?.initSurfaceView(videoView)
-                view
-            },
-            modifier = Modifier.padding(it)
-        )
+    WebRTCVideoView {
+        viewModel.init(application, it)
     }
 
     BackHandler {
-        rtcClient?.endCall(userId, sensorId, false)
-        navBack()
+        viewModel.endCall()
+        navController.navigateUp()
     }
 }
