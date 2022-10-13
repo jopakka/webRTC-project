@@ -7,18 +7,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.monitor.app.ui.control.main.ControlMainScreen
-import com.monitor.app.ui.sensor.main.SensorMainScreen
 import com.monitor.app.ui.control.sensor.ControlSensorScreen
+import com.monitor.app.ui.sensor.main.SensorMainScreen
+import com.monitor.app.ui.shared.DeviceTypeView
 
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = "main"
+    startDestination: String = "chooseDeviceType"
 ) {
     NavHost(
         modifier = modifier, navController = navController, startDestination = startDestination
     ) {
+        composable("chooseDeviceType") {
+            DeviceTypeView(navController = navController)
+        }
         composable("main") {
             ControlMainScreen(navController)
         }
