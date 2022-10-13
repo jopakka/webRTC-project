@@ -106,39 +106,6 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
                     mSignalingClient.value?.sendIceCandidate(p0, true)
                     mRtcClient.value?.addIceCandidate(p0)
                 }
-
-                override fun onAddStream(p0: MediaStream?) {
-                    super.onAddStream(p0)
-                    Log.d(TAG, "onAddStream: $p0")
-                }
-
-                override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {
-                    Log.d(TAG, "onIceConnectionChange: $p0")
-                }
-
-                override fun onIceConnectionReceivingChange(p0: Boolean) {
-                    Log.d(TAG, "onIceConnectionReceivingChange: $p0")
-                }
-
-                override fun onConnectionChange(newState: PeerConnection.PeerConnectionState?) {
-                    Log.d(TAG, "onConnectionChange: $newState")
-                }
-
-                override fun onDataChannel(p0: DataChannel?) {
-                    Log.d(TAG, "onDataChannel: $p0")
-                }
-
-                override fun onStandardizedIceConnectionChange(newState: PeerConnection.IceConnectionState?) {
-                    Log.d(TAG, "onStandardizedIceConnectionChange: $newState")
-                }
-
-                override fun onAddTrack(p0: RtpReceiver?, p1: Array<out MediaStream>?) {
-                    Log.d(TAG, "onAddTrack: $p0 \n $p1")
-                }
-
-                override fun onTrack(transceiver: RtpTransceiver?) {
-                    Log.d(TAG, "onTrack: $transceiver")
-                }
             }
         )
 
