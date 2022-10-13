@@ -7,25 +7,21 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.webrtc.*
 
-
 class RTCClient(
     context: Application,
-    observer: PeerConnection.Observer
+    private val observer: PeerConnection.Observer
 ) {
 
     companion object {
         private const val LOCAL_TRACK_ID = "local_track"
         private const val LOCAL_STREAM_ID = "local_track"
+        private const val TAG = "RTCClient"
     }
 
     private val rootEglBase: EglBase = EglBase.create()
-
     private var localAudioTrack: AudioTrack? = null
     private var localVideoTrack: VideoTrack? = null
-    val TAG = "RTCClient"
-
     var remoteSessionDescription: SessionDescription? = null
-
     val db = Firebase.firestore
 
     init {
@@ -36,10 +32,8 @@ class RTCClient(
         PeerConnection.IceServer.builder("stun:stun.l.google.com:19302")
             .createIceServer()
     )
-
     private val peerConnectionFactory by lazy { buildPeerConnectionFactory() }
     private val videoCapturer by lazy { getVideoCapturer(context) }
-
     private val audioSource by lazy { peerConnectionFactory.createAudioSource(MediaConstraints()) }
     private val localVideoSource by lazy { peerConnectionFactory.createVideoSource(false) }
     private val peerConnection by lazy { buildPeerConnection(observer) }
@@ -245,12 +239,7 @@ class RTCClient(
 
     fun endCall(userID: String, sensorID: String, reCall: Boolean) {
         if (reCall) {
-            val sdpObserver = object : AppSdpObserver() {
-                override fun onCreateSuccess(p0: SessionDescription?) {
-                    super.onCreateSuccess(p0)
-                    Log.d(TAG, "onCreateSuccess reCreated send")
-                }
-            }
+            val sdpObserver = object : AppSdpObserver() {}
             call(sdpObserver, userID, sensorID)
             return
         }

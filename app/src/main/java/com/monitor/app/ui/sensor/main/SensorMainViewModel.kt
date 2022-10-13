@@ -14,11 +14,13 @@ import com.monitor.app.core.constants.Constants
 import com.monitor.app.data.rtcclient.AppSdpObserver
 import com.monitor.app.data.rtcclient.PeerConnectionObserver
 import com.monitor.app.data.rtcclient.RTCClient
+import com.monitor.app.data.signalingclient.ISignalingClientListener
 import com.monitor.app.data.signalingclient.SignalingClient
-import com.monitor.app.data.signalingclient.SignalingClientListener
-import com.monitor.app.ui.control.sensor.ControlSensorViewModel
+import com.monitor.app.data.signalingclient.SignalingClientObserver
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.webrtc.*
+import org.webrtc.IceCandidate
+import org.webrtc.SessionDescription
+import org.webrtc.SurfaceViewRenderer
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SensorMainViewModel(private val userId: String, private val sensorId: String) : ViewModel() {
@@ -31,6 +33,7 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
     private val mRtcClient = mutableStateOf<RTCClient?>(null)
     private val mSignalingClient = mutableStateOf<SignalingClient?>(null)
     private var isInitialized by mutableStateOf(false)
+    private val sdpObserver = object : AppSdpObserver() {}
 
     private val _hasPermissions: MutableState<Boolean> = mutableStateOf(false)
     val hasPermissions: State<Boolean>
@@ -55,44 +58,8 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
         _hasPermissions.value = value
     }
 
-    val sdpObserver = object : AppSdpObserver() {
-        override fun onCreateSuccess(p0: SessionDescription?) {
-            super.onCreateSuccess(p0)
-            Log.d(TAG, "onCreateSuccess send")
-        }
-    }
-
-    private fun createSignallingClientListener() = object : SignalingClientListener {
-        override fun onConnectionEstablished() {
-            Log.d(TAG, "onConnectionEstablished")
-        }
-
-        override fun onOfferReceived(description: SessionDescription) {
-            Log.d(TAG, "onOfferReceived")
-            mRtcClient.value?.onRemoteSessionReceived(description)
-            Constants.isIntiatedNow = false
-            mRtcClient.value?.answer(sdpObserver, userId, sensorId)
-        }
-
-        override fun onAnswerReceived(description: SessionDescription) {
-            Log.d(TAG, "onAnswerReceived")
-            mRtcClient.value?.onRemoteSessionReceived(description)
-            Constants.isIntiatedNow = false
-        }
-
-        override fun onIceCandidateReceived(iceCandidate: IceCandidate) {
-            Log.d(TAG, "onIceCandidateReceived")
-            mRtcClient.value?.addIceCandidate(iceCandidate)
-        }
-
-        override fun onCallEnded() {
-            Log.d(TAG, "onCallEnded")
-            mRtcClient.value?.endCall(userId, sensorId, true)
-        }
-    }
-
     fun init(application: Application, videoView: SurfaceViewRenderer) {
-        if(isInitialized) {
+        if (isInitialized) {
             return
         }
         isInitialized = true
@@ -102,7 +69,6 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
             object : PeerConnectionObserver() {
                 override fun onIceCandidate(p0: IceCandidate?) {
                     super.onIceCandidate(p0)
-                    Log.d(TAG, "onIceCandidate: candidate=$p0")
                     mSignalingClient.value?.sendIceCandidate(p0, true)
                     mRtcClient.value?.addIceCandidate(p0)
                 }
@@ -111,8 +77,33 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
 
         mRtcClient.value?.initSurfaceView(videoView)
         mRtcClient.value?.startLocalVideoCapture(videoView)
-        mSignalingClient.value =
-            SignalingClient(userId, sensorId, createSignallingClientListener())
+        mSignalingClient.value = SignalingClient(
+            userId,
+            sensorId,
+            object : SignalingClientObserver() {
+                override fun onOfferReceived(description: SessionDescription) {
+                    super.onOfferReceived(description)
+                    mRtcClient.value?.onRemoteSessionReceived(description)
+                    Constants.isIntiatedNow = false
+                    mRtcClient.value?.answer(sdpObserver, userId, sensorId)
+                }
+
+                override fun onAnswerReceived(description: SessionDescription) {
+                    super.onAnswerReceived(description)
+                    mRtcClient.value?.onRemoteSessionReceived(description)
+                    Constants.isIntiatedNow = false
+                }
+
+                override fun onIceCandidateReceived(iceCandidate: IceCandidate) {
+                    super.onIceCandidateReceived(iceCandidate)
+                    mRtcClient.value?.addIceCandidate(iceCandidate)
+                }
+
+                override fun onCallEnded() {
+                    super.onCallEnded()
+                    mRtcClient.value?.endCall(userId, sensorId, true)
+                }
+            })
         mRtcClient.value?.call(sdpObserver, userId, sensorId)
     }
 

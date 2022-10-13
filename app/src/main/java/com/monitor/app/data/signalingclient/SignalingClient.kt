@@ -13,7 +13,7 @@ import org.webrtc.SessionDescription
 class SignalingClient(
     private val userID: String,
     private val sensorID: String,
-    private val listener: SignalingClientListener
+    private val listener: ISignalingClientListener
 ) : CoroutineScope {
 
     companion object {
