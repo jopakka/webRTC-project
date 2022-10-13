@@ -16,27 +16,4 @@ class SensorMainViewModel : ViewModel() {
         private const val AUDIO_PERMISSION = Manifest.permission.RECORD_AUDIO
         private const val TAG = "SensorSendViewModel"
     }
-
-    private val _hasPermissions: MutableState<Boolean> = mutableStateOf(false)
-    val hasPermissions: State<Boolean>
-        get() = _hasPermissions
-
-    fun checkAndRequestPermissions(
-        context: Context,
-        permissions: Array<String>,
-        launcher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>
-    ) {
-        if (permissions.all {
-                ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-            }) {
-            _hasPermissions.value = true
-        } else {
-            _hasPermissions.value = false
-            launcher.launch(permissions)
-        }
-    }
-
-    fun setHasPermission(value: Boolean) {
-        _hasPermissions.value = value
-    }
 }
