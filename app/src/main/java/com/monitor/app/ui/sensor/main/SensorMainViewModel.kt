@@ -66,13 +66,7 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
 
         mRtcClient.value = RTCClient(
             application,
-            object : PeerConnectionObserver() {
-                override fun onIceCandidate(p0: IceCandidate?) {
-                    super.onIceCandidate(p0)
-                    mSignalingClient.value?.sendIceCandidate(p0, true)
-                    mRtcClient.value?.addIceCandidate(p0)
-                }
-            }
+            object : PeerConnectionObserver(mSignalingClient.value, mRtcClient.value, true) {}
         )
 
         mRtcClient.value?.initSurfaceView(videoView)
