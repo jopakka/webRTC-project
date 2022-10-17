@@ -21,7 +21,7 @@ fun AppNavHost(
         modifier = modifier, navController = navController, startDestination = startDestination
     ) {
         composable("chooseDeviceType") {
-            DeviceTypeView(navController = navController)
+            DeviceTypeView(navController)
         }
         composable("main") {
             ControlMainScreen(navController)
