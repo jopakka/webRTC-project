@@ -15,12 +15,12 @@ import com.monitor.app.ui.shared.DeviceTypeView
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = "chooseDeviceType"
+    startDestination: String = "deviceTypeView"
 ) {
     NavHost(
         modifier = modifier, navController = navController, startDestination = startDestination
     ) {
-        composable("chooseDeviceType") {
+        composable("deviceTypeView") {
             DeviceTypeView(navController)
         }
         composable("main") {
