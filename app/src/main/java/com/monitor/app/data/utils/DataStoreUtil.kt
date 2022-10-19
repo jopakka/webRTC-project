@@ -21,7 +21,7 @@ class DataStoreUtil(private val context: Context) {
         val IS_MAIN_DEVICE = booleanPreferencesKey("is_main_device")
     }
 
-    //get the saved email
+    //get the saved device type
     val getDeviceType: Flow<Boolean?> = context.dataStore.data
         .catch { exception ->
             // dataStore.data throws an IOException when an error is encountered when reading data
@@ -36,7 +36,7 @@ class DataStoreUtil(private val context: Context) {
             it[IS_MAIN_DEVICE]
         }
 
-    //save email into datastore
+    //save device type into datastore
     suspend fun saveDeviceType(isMainDevice: Boolean) {
         try {
             context.dataStore.edit { preferences ->
