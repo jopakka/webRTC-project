@@ -91,6 +91,9 @@ dependencies {
     // Accompanist Permission
     implementation("com.google.accompanist:accompanist-permissions:0.25.1")
 
+    // Jetpack DataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
     // UI Tests
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.1")
 
