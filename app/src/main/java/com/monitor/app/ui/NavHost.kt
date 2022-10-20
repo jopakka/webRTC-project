@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.monitor.app.ui.control.main.ControlMainScreen
 import com.monitor.app.ui.control.sensor.ControlSensorScreen
+import com.monitor.app.ui.sensor.init.SensorInitScreen
 import com.monitor.app.ui.sensor.main.SensorMainScreen
 import com.monitor.app.ui.shared.DeviceTypeView
 
@@ -23,7 +24,10 @@ fun AppNavHost(
         composable("deviceTypeView") {
             DeviceTypeView(navController)
         }
-        composable("main") {
+        composable("sensorInit") {
+            SensorInitScreen(navController)
+        }
+        composable("controlMain") {
             ControlMainScreen(navController)
         }
         composable("sensorSend/{userID}/{sensorID}") {
