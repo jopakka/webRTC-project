@@ -2,4 +2,22 @@
     <string name="app_name">Home monitoring system</string>
     <string name="pref_speakerphone_key">speakerphone_preference</string>
     <string name="pref_speakerphone_default">auto</string>
+
+    <string name="ready">Ready</string>
+    <string name="sensors">Sensors</string>
+    <string name="next">Next</string>
+
+    <string name="error_create_sensor">Error while creating sensor. Please try again.</string>
+    <string name="give_sensor_info">Give sensor information</string>
+    <string name="tf_name_title">Name</string>
+    <string name="tf_name_placeholder">Living room, hallway…</string>
+    <string name="tf_info_title">Info</string>
+    <string name="tf_info_placeholder">In corner, next to fireplace…</string>
+    <string name="choose_device_type">Choose your device type</string>
+    <string name="device_main">Main Device</string>
+    <string name="device_main_info">Choose this if this device is going to be used to monitor your security cameras</string>
+    <string name="device_sensor">Sensor Device</string>
+    <string name="device_sensor_info">Choose this if this device is going to be used as security camera</string>
+
+    <string name="description_change_camera">Change camera</string>
 </resources>

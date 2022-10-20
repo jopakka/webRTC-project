@@ -8,8 +8,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.monitor.app.R
 import com.monitor.app.core.components.SelectableItem
 import com.monitor.app.data.utils.DataStoreUtil
 import kotlinx.coroutines.launch
@@ -30,7 +32,11 @@ fun DeviceTypeView(navController: NavHostController) {
     LaunchedEffect(key1 = savedDeviceTypeIsMain) {
         scope.launch {
             savedDeviceTypeIsMain?.let {
-                navController.navigate("main")
+                if (it) {
+                    navController.navigate("controlMain")
+                } else {
+                    navController.navigate("sensorInit")
+                }
             }
         }
     }
@@ -40,20 +46,23 @@ fun DeviceTypeView(navController: NavHostController) {
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Choose your device type", style = MaterialTheme.typography.h4)
+        Text(
+            text = stringResource(R.string.choose_device_type),
+            style = MaterialTheme.typography.h4
+        )
         Column(modifier = Modifier.padding(horizontal = 60.dp)) {
             SelectableItem(
                 selected = deviceTypeIsMain ?: false,
-                title = "Main Device",
-                subtitle = "Choose this if this device is going to be used to monitor your security cameras"
+                title = stringResource(R.string.device_main),
+                subtitle = stringResource(R.string.device_main_info)
             ) {
                 deviceTypeIsMain = it
             }
             Spacer(modifier = Modifier.height(12.dp))
             SelectableItem(
                 selected = deviceTypeIsMain?.let { !it } ?: false,
-                title = "Sensor Device",
-                subtitle = "Choose this if this device is going to be used as security camera"
+                title = stringResource(R.string.device_sensor),
+                subtitle = stringResource(R.string.device_sensor_info)
             ) {
                 deviceTypeIsMain = !it
             }
@@ -64,7 +73,7 @@ fun DeviceTypeView(navController: NavHostController) {
                 dataStore.saveDeviceType(deviceTypeIsMain ?: return@launch)
             }
         }, enabled = deviceTypeIsMain?.let { true } ?: false) {
-            Text(text = "NEXT")
+            Text(text = stringResource(R.string.next))
         }
     }
 }
