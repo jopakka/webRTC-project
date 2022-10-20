@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.monitor.app.R
@@ -22,24 +23,7 @@ fun DeviceTypeView(navController: NavHostController) {
     val scope = rememberCoroutineScope()
     val dataStore = DataStoreUtil(context)
 
-    val savedDeviceTypeIsMain by dataStore.getDeviceType.collectAsState(initial = null)
     var deviceTypeIsMain: Boolean? by remember { mutableStateOf(null) }
-
-    /**
-     * Inside let, navigate to corresponding view
-     * based on value of savedDeviceType
-     */
-    LaunchedEffect(key1 = savedDeviceTypeIsMain) {
-        scope.launch {
-            savedDeviceTypeIsMain?.let {
-                if (it) {
-                    navController.navigate("controlMain")
-                } else {
-                    navController.navigate("sensorInit")
-                }
-            }
-        }
-    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -48,7 +32,8 @@ fun DeviceTypeView(navController: NavHostController) {
     ) {
         Text(
             text = stringResource(R.string.choose_device_type),
-            style = MaterialTheme.typography.h4
+            style = MaterialTheme.typography.h4,
+            textAlign = TextAlign.Center
         )
         Column(modifier = Modifier.padding(horizontal = 60.dp)) {
             SelectableItem(
@@ -70,7 +55,9 @@ fun DeviceTypeView(navController: NavHostController) {
 
         Button(onClick = {
             scope.launch {
-                dataStore.saveDeviceType(deviceTypeIsMain ?: return@launch)
+                val isMain = deviceTypeIsMain ?: return@launch
+                dataStore.saveDeviceType(isMain)
+                navController.navigate(if (isMain) "controlMain" else "sensorInit")
             }
         }, enabled = deviceTypeIsMain?.let { true } ?: false) {
             Text(text = stringResource(R.string.next))
