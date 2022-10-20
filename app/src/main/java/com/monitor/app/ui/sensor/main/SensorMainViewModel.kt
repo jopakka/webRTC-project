@@ -51,28 +51,10 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
         mSignalingClient.value = SignalingClient(
             userId,
             sensorId,
-            object : SignalingClientObserver() {
-                override fun onOfferReceived(description: SessionDescription) {
-                    super.onOfferReceived(description)
-                    mRtcClient.value?.onRemoteSessionReceived(description)
-                    Constants.isIntiatedNow = false
-                    mRtcClient.value?.answer(sdpObserver, userId, sensorId)
-                }
-
-                override fun onAnswerReceived(description: SessionDescription) {
-                    super.onAnswerReceived(description)
-                    mRtcClient.value?.onRemoteSessionReceived(description)
-                    Constants.isIntiatedNow = false
-                }
-
-                override fun onIceCandidateReceived(iceCandidate: IceCandidate) {
-                    super.onIceCandidateReceived(iceCandidate)
-                    mRtcClient.value?.addIceCandidate(iceCandidate)
-                }
-
+            object : SignalingClientObserver(mRtcClient.value, sdpObserver, userId, sensorId) {
                 override fun onCallEnded() {
                     super.onCallEnded()
-                    mRtcClient.value?.endCall(userId, sensorId, true)
+                    endCall(true)
                 }
             })
         mRtcClient.value?.call(sdpObserver, userId, sensorId)
