@@ -18,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
 import com.monitor.app.R
-import com.monitor.app.data.screens.Screen
 import com.monitor.app.data.utils.DataStoreUtil
 
 @Composable
@@ -34,8 +33,8 @@ fun SplashScreen(navController: NavHostController) {
     LaunchedEffect(key1 = savedDeviceTypeIsMain) {
         Log.d("SplashScreen", "savedDeviceTypeIsMain=$savedDeviceTypeIsMain")
         navController.navigate(
-            if (savedDeviceTypeIsMain == true) Screen.ControlMain.route
-            else Screen.TypeSelect.route
+            if (savedDeviceTypeIsMain == true) "controlMain"
+            else "deviceTypeView"
         )
     }
 
