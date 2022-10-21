@@ -1,32 +1,27 @@
 package com.monitor.app.ui.sensor.main
 
-import android.Manifest
 import android.app.Application
-import android.content.Context
-import android.content.pm.PackageManager
 import android.util.Log
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.compose.runtime.*
-import androidx.core.content.ContextCompat
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.monitor.app.core.constants.Constants
 import com.monitor.app.data.rtcclient.AppSdpObserver
+import com.monitor.app.data.rtcclient.DataChannelObserver
 import com.monitor.app.data.rtcclient.PeerConnectionObserver
 import com.monitor.app.data.rtcclient.RTCClient
-import com.monitor.app.data.signalingclient.ISignalingClientListener
 import com.monitor.app.data.signalingclient.SignalingClient
 import com.monitor.app.data.signalingclient.SignalingClientObserver
+import io.ktor.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.webrtc.IceCandidate
-import org.webrtc.SessionDescription
+import org.webrtc.DataChannel
 import org.webrtc.SurfaceViewRenderer
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SensorMainViewModel(private val userId: String, private val sensorId: String) : ViewModel() {
     companion object {
-        private const val CAMERA_PERMISSION = Manifest.permission.CAMERA
-        private const val AUDIO_PERMISSION = Manifest.permission.RECORD_AUDIO
         private const val TAG = "SensorSendViewModel"
     }
 
@@ -43,7 +38,19 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
 
         mRtcClient.value = RTCClient(
             application,
-            object : PeerConnectionObserver(mSignalingClient.value, mRtcClient.value, true) {}
+            object : PeerConnectionObserver(mSignalingClient.value, mRtcClient.value, true, object :
+                DataChannelObserver() {
+                override fun onMessage(p0: DataChannel.Buffer?) {
+                    super.onMessage(p0)
+                    val byteBuffer = p0?.data?.moveToByteArray() ?: ByteArray(0)
+
+                    when (String(byteBuffer)) {
+                        "flash" -> Log.d(TAG, "this should toggle flash")
+                        "camera" -> Log.d(TAG, "this switch cameras")
+                        else -> Log.d(TAG, "Unknown command")
+                    }
+                }
+            }) {}
         )
 
         mRtcClient.value?.initSurfaceView(videoView)
@@ -54,6 +61,7 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
             object : SignalingClientObserver(mRtcClient.value, sdpObserver, userId, sensorId) {
                 override fun onCallEnded() {
                     super.onCallEnded()
+                    if (Constants.selfEndedCall) return
                     endCall(true)
                 }
             })
@@ -65,6 +73,7 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
     }
 
     fun endCall(recall: Boolean = false) {
+        Constants.selfEndedCall = !recall
         mRtcClient.value?.endCall(userId, sensorId, recall)
     }
 }

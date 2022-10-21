@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.monitor.app.core.constants.Constants
 import com.monitor.app.data.rtcclient.AppSdpObserver
+import com.monitor.app.data.rtcclient.DataChannelObserver
 import com.monitor.app.data.rtcclient.PeerConnectionObserver
 import com.monitor.app.data.rtcclient.RTCClient
 import com.monitor.app.data.signalingclient.SignalingClient
@@ -15,7 +16,6 @@ import com.monitor.app.data.signalingclient.SignalingClientObserver
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
-import org.webrtc.SessionDescription
 import org.webrtc.SurfaceViewRenderer
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -38,7 +38,7 @@ class ControlSensorViewModel(private val userId: String, private val sensorId: S
 
         mRtcClient.value = RTCClient(
             application,
-            object : PeerConnectionObserver() {
+            object : PeerConnectionObserver(dataObserver = object : DataChannelObserver() {}) {
                 override fun onIceCandidate(p0: IceCandidate?) {
                     super.onIceCandidate(p0)
                     mSignalingClient.value?.sendIceCandidate(p0, false)
@@ -60,16 +60,19 @@ class ControlSensorViewModel(private val userId: String, private val sensorId: S
             object : SignalingClientObserver(mRtcClient.value, sdpObserver, userId, sensorId) {
                 override fun onCallEnded() {
                     super.onCallEnded()
-                    if (!Constants.isCallEnded) {
-                        endCall()
-                        Constants.isCallEnded = true
-                    }
+                    if (Constants.selfEndedCall) return
+                    endCall()
                 }
             })
     }
 
     fun endCall(recall: Boolean = false) {
+        Constants.selfEndedCall = !recall
         mRtcClient.value?.endCall(userId, sensorId, recall)
+    }
+
+    fun sendData(data: String) {
+        mRtcClient.value?.sendData(data)
     }
 }
 

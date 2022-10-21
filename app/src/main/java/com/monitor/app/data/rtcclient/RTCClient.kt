@@ -6,6 +6,7 @@ import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.webrtc.*
+import java.nio.ByteBuffer
 
 class RTCClient(
     context: Application,
@@ -32,6 +33,8 @@ class RTCClient(
         PeerConnection.IceServer.builder("stun:stun.l.google.com:19302")
             .createIceServer()
     )
+
+    private lateinit var dataChannel: DataChannel
     private val peerConnectionFactory by lazy { buildPeerConnectionFactory() }
     private val videoCapturer by lazy { getVideoCapturer(context) }
     private val audioSource by lazy { peerConnectionFactory.createAudioSource(MediaConstraints()) }
@@ -58,17 +61,22 @@ class RTCClient(
                 )
             )
             .setOptions(PeerConnectionFactory.Options().apply {
-                disableEncryption = true
                 disableNetworkMonitor = true
             })
             .createPeerConnectionFactory()
     }
 
-    private fun buildPeerConnection(observer: PeerConnection.Observer) =
-        peerConnectionFactory.createPeerConnection(
+    private fun buildPeerConnection(observer: PeerConnection.Observer): PeerConnection? {
+        return peerConnectionFactory.createPeerConnection(
             iceServer,
             observer
-        )
+        )?.also {
+            val dcInit = DataChannel.Init().apply {
+                id = 1
+            }
+            dataChannel = it.createDataChannel("testChannel", dcInit)
+        }
+    }
 
     private fun getVideoCapturer(context: Context) =
         Camera2Enumerator(context).run {
@@ -243,6 +251,7 @@ class RTCClient(
             call(sdpObserver, userID, sensorID)
             return
         }
+        videoCapturer.stopCapture()
         db.collection(userID).document(sensorID).collection("candidates")
             .get().addOnSuccessListener {
                 val iceCandidateArray: MutableList<IceCandidate> = mutableListOf()
@@ -294,5 +303,9 @@ class RTCClient(
 
     fun switchCamera() {
         videoCapturer.switchCamera(null)
+    }
+
+    fun sendData(data: String) {
+        dataChannel.send(DataChannel.Buffer(ByteBuffer.wrap(data.toByteArray()), false))
     }
 }
