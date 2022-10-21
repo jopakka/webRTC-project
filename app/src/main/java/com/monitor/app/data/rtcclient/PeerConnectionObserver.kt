@@ -9,7 +9,8 @@ import org.webrtc.*
 open class PeerConnectionObserver(
     private val signalingClient: SignalingClient? = null,
     private val rtcClient: RTCClient? = null,
-    private val isSensor: Boolean = false
+    private val isSensor: Boolean = false,
+    private val dataObserver: DataChannelObserver,
 ) : PeerConnection.Observer {
     companion object {
         private const val TAG = "PeerConnectionObserver"
@@ -23,6 +24,7 @@ open class PeerConnectionObserver(
 
     override fun onDataChannel(p0: DataChannel?) {
         Log.d(TAG, "onDataChannel: $p0")
+        p0?.registerObserver(dataObserver)
     }
 
     override fun onIceConnectionReceivingChange(p0: Boolean) {
