@@ -14,15 +14,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.monitor.app.R
 import com.monitor.app.core.components.LoadingIndicator
 import com.monitor.app.core.components.TextInputField
 
 @Composable
 fun SensorInitScreen(
-    navController: NavHostController,
-    viewModel: SensorInitViewModel = viewModel()
+    userId: String,
+    viewModel: SensorInitViewModel = viewModel(
+        factory = SensorInitViewModelFactory(userId)
+    ),
+    onSensorAdded: (id: String) -> Unit
 ) {
     var name by remember { mutableStateOf("") }
     var info by remember { mutableStateOf("") }
@@ -35,12 +37,11 @@ fun SensorInitScreen(
         loading = true
         viewModel.addSensor(name, info) { id, error ->
             loading = false
-            if (error != null) {
+            if (error != null || id == null) {
                 errorToast.show()
                 return@addSensor
             }
-            val user = "user-1"
-            navController.navigate("sensorSend/$user/${id}")
+            onSensorAdded(id)
         }
     }
 

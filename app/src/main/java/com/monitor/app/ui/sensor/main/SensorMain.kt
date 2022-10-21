@@ -20,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.monitor.app.R
@@ -30,12 +29,12 @@ import com.monitor.app.core.components.WebRTCVideoView
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SensorMainScreen(
-    navController: NavHostController,
     userId: String,
     sensorId: String,
     viewModel: SensorMainViewModel = viewModel(
         factory = SensorMainViewModelFactory(userId, sensorId)
-    )
+    ),
+    onNavigateBack: () -> Unit
 ) {
     KeepScreenOn()
 
@@ -76,6 +75,6 @@ fun SensorMainScreen(
 
     BackHandler {
         viewModel.endCall()
-        navController.navigateUp()
+        onNavigateBack()
     }
 }

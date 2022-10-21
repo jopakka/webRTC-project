@@ -10,13 +10,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.monitor.app.R
 import com.monitor.app.core.components.SensorList
 import com.monitor.app.core.constants.Constants
 
 @Composable
-fun ControlMainScreen(navigator: NavHostController, viewModel: ControlMainViewModel = viewModel()) {
+fun ControlMainScreen(
+    userId: String,
+    viewModel: ControlMainViewModel = viewModel(
+        factory = ControlMainViewModelFactory(userId)
+    ),
+    onSensorSelected: (id: String) -> Unit
+) {
     val sensors = viewModel.sensors
 
     Constants.isIntiatedNow = true
@@ -31,8 +36,7 @@ fun ControlMainScreen(navigator: NavHostController, viewModel: ControlMainViewMo
             ) {
                 Text(text = stringResource(R.string.sensors), style = MaterialTheme.typography.h2)
                 SensorList(sensors = sensors) { id ->
-                    val user = "user-1"
-                    navigator.navigate("sensorView/$user/$id")
+                    onSensorSelected(id)
                 }
             }
         }

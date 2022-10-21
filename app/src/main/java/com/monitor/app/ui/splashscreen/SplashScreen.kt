@@ -16,12 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.navigation.NavHostController
 import com.monitor.app.R
 import com.monitor.app.data.utils.DataStoreUtil
 
 @Composable
-fun SplashScreen(navController: NavHostController) {
+fun SplashScreen(onDeviceFound: (isMain: Boolean) -> Unit) {
     val context = LocalContext.current
     val dataStore = DataStoreUtil(context)
     val savedDeviceTypeIsMain by dataStore.getDeviceType.collectAsState(initial = null)
@@ -32,10 +31,7 @@ fun SplashScreen(navController: NavHostController) {
      */
     LaunchedEffect(key1 = savedDeviceTypeIsMain) {
         Log.d("SplashScreen", "savedDeviceTypeIsMain=$savedDeviceTypeIsMain")
-        navController.navigate(
-            if (savedDeviceTypeIsMain == true) "controlMain"
-            else "deviceTypeView"
-        )
+        onDeviceFound(savedDeviceTypeIsMain == true)
     }
 
     Column(

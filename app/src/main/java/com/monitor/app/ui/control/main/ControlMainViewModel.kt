@@ -3,13 +3,16 @@ package com.monitor.app.ui.control.main
 import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
-import androidx.navigation.NavHostController
+import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.monitor.app.data.model.SensorInfo
 
-class ControlMainViewModel : ViewModel() {
-    private val TAG = "TestViewModel"
+class ControlMainViewModel(private val userId: String) : ViewModel() {
+    companion object {
+        private const val TAG = "TestViewModel"
+    }
+
     private val firestore = Firebase.firestore
     private val _sensors = mutableStateMapOf<String, SensorInfo>()
     val sensors: List<SensorInfo>
@@ -21,7 +24,7 @@ class ControlMainViewModel : ViewModel() {
 
     private fun getFirebaseSensors() {
         try {
-            firestore.collection("user-1").addSnapshotListener { querySnapshot, e ->
+            firestore.collection(userId).addSnapshotListener { querySnapshot, e ->
                 if (e != null) {
                     Log.w(TAG, "listen:error", e)
                     return@addSnapshotListener
@@ -51,17 +54,12 @@ class ControlMainViewModel : ViewModel() {
             Log.e(TAG, "${e.message}")
         }
     }
+}
 
-    fun addSensor(name: String, info: String, navigator: NavHostController) {
-        try {
-            val sensor = SensorInfo(name, info)
-            val user = "user-1"
-            firestore.collection(user).add(sensor).addOnSuccessListener {
-                Log.d(TAG, "Sensor added successfully: ${it.id}")
-                navigator.navigate("sensorSend/$user/${it.id}")
-            }
-        } catch (e: Error) {
-            Log.e(TAG, "${e.message}")
-        }
+class ControlMainViewModelFactory(private val userId: String) :
+    ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return ControlMainViewModel(userId) as T
     }
 }
