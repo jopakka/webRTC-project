@@ -11,14 +11,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.monitor.app.R
 import com.monitor.app.core.components.SelectableItem
 import com.monitor.app.data.utils.DataStoreUtil
 import kotlinx.coroutines.launch
 
 @Composable
-fun DeviceTypeView(navController: NavHostController) {
+fun DeviceTypeView(onDeviceSelected: (isMain: Boolean) -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val dataStore = DataStoreUtil(context)
@@ -57,7 +56,7 @@ fun DeviceTypeView(navController: NavHostController) {
             scope.launch {
                 val isMain = deviceTypeIsMain ?: return@launch
                 dataStore.saveDeviceType(isMain)
-                navController.navigate(if (isMain) "controlMain" else "sensorInit")
+                onDeviceSelected(isMain)
             }
         }, enabled = deviceTypeIsMain?.let { true } ?: false) {
             Text(text = stringResource(R.string.next))

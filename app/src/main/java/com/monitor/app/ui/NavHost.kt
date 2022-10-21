@@ -19,34 +19,44 @@ fun AppNavHost(
     navController: NavHostController = rememberNavController(),
     startDestination: String = "splashScreen"
 ) {
+    val user = "user-1"
     NavHost(
         modifier = modifier, navController = navController, startDestination = startDestination
     ) {
         composable("splashScreen") {
-            SplashScreen(navController)
+            SplashScreen { isMain ->
+                navController.navigate(
+                    if (isMain) "controlMain"
+                    else "deviceTypeView"
+                )
+            }
         }
         composable("deviceTypeView") {
-            DeviceTypeView(navController)
+            DeviceTypeView { isMain ->
+                navController.navigate(if (isMain) "controlMain" else "sensorInit")
+            }
         }
         composable("sensorInit") {
-            SensorInitScreen(navController)
+            SensorInitScreen(user) { id ->
+                navController.navigate("sensorSend/${id}")
+            }
         }
         composable("controlMain") {
-            ControlMainScreen(navController)
+            ControlMainScreen(user) { id ->
+                navController.navigate("sensorView/$id")
+            }
         }
-        composable("sensorSend/{userID}/{sensorID}") {
-            SensorMainScreen(
-                navController,
-                it.arguments?.getString("userID")!!,
-                it.arguments?.getString("sensorID")!!,
-            )
+        composable("sensorSend/{sensorID}") {
+            val sensor = it.arguments?.getString("sensorID") ?: return@composable
+            SensorMainScreen(user, sensor) {
+                navController.navigateUp()
+            }
         }
-        composable("sensorView/{userID}/{sensorID}") {
-            ControlSensorScreen(
-                navController,
-                it.arguments?.getString("userID")!!,
-                it.arguments?.getString("sensorID")!!,
-            )
+        composable("sensorView/{sensorID}") {
+            val sensor = it.arguments?.getString("sensorID") ?: return@composable
+            ControlSensorScreen(user, sensor) {
+                navController.navigateUp()
+            }
         }
     }
 }
