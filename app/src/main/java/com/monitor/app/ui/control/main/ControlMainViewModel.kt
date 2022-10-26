@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.monitor.app.data.model.SensorInfo
+import java.util.*
 
 class ControlMainViewModel(private val userId: String) : ViewModel() {
     companion object {
@@ -41,7 +42,7 @@ class ControlMainViewModel(private val userId: String) : ViewModel() {
                         val info = SensorInfo(
                             data["name"].toString(),
                             data["info"].toString(),
-                            data["createdAt"]?.toString()?.toLong() ?: 0,
+                            snapshot.getTimestamp("createdAt")?.toDate(),
                             key
                         )
                         _sensors[key] = info

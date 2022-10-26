@@ -122,13 +122,9 @@ class RTCClient(
 
         createOffer(object : SdpObserver by sdpObserver {
             override fun onCreateSuccess(desc: SessionDescription?) {
-                setLocalDescription(object : SdpObserver {
-                    override fun onSetFailure(p0: String?) {
-                        Log.e(TAG, "onSetFailure-setLocalDescription: $p0")
-                    }
-
+                setLocalDescription(object : AppSdpObserver() {
                     override fun onSetSuccess() {
-                        Log.d(TAG, "onSetSuccess start")
+                        super.onSetSuccess()
                         val offer = hashMapOf(
                             "sdp" to desc?.description,
                             "type" to desc?.type
@@ -142,14 +138,6 @@ class RTCClient(
                                 Log.e(TAG, "Error adding document", e)
                             }
                         Log.d(TAG, "onSetSuccess")
-                    }
-
-                    override fun onCreateSuccess(p0: SessionDescription?) {
-                        Log.d(TAG, "onCreateSuccess: Description $p0")
-                    }
-
-                    override fun onCreateFailure(p0: String?) {
-                        Log.e(TAG, "onCreateFailure: $p0")
                     }
                 }, desc)
                 sdpObserver.onCreateSuccess(desc)
@@ -185,23 +173,7 @@ class RTCClient(
                     .addOnFailureListener { e ->
                         Log.e(TAG, "Error adding document", e)
                     }
-                setLocalDescription(object : SdpObserver {
-                    override fun onSetFailure(p0: String?) {
-                        Log.e(TAG, "onSetFailure-setLocalDescription: $p0")
-                    }
-
-                    override fun onSetSuccess() {
-                        Log.d(TAG, "onSetSuccess")
-                    }
-
-                    override fun onCreateSuccess(p0: SessionDescription?) {
-                        Log.d(TAG, "onCreateSuccess: Description $p0")
-                    }
-
-                    override fun onCreateFailure(p0: String?) {
-                        Log.e(TAG, "onCreateFailureLocal: $p0")
-                    }
-                }, desc)
+                setLocalDescription(object : AppSdpObserver() {}, desc)
                 sdpObserver.onCreateSuccess(desc)
             }
 
@@ -221,24 +193,7 @@ class RTCClient(
         Log.d(TAG, "onRemoteSessionReceived")
         Log.d(TAG, "sessionDescription=${sessionDescription.type}")
         remoteSessionDescription = sessionDescription
-        peerConnection?.setRemoteDescription(object : SdpObserver {
-            override fun onSetFailure(p0: String?) {
-                Log.e(TAG, "onSetFailure-setRemoteDescription: $p0")
-            }
-
-            override fun onSetSuccess() {
-                Log.d(TAG, "onSetSuccessRemoteSession")
-            }
-
-            override fun onCreateSuccess(p0: SessionDescription?) {
-                Log.d(TAG, "onCreateSuccessRemoteSession: Description $p0")
-            }
-
-            override fun onCreateFailure(p0: String?) {
-                Log.e(TAG, "onCreateFailure")
-            }
-        }, sessionDescription)
-
+        peerConnection?.setRemoteDescription(object : AppSdpObserver() {}, sessionDescription)
     }
 
     fun addIceCandidate(iceCandidate: IceCandidate?) {
