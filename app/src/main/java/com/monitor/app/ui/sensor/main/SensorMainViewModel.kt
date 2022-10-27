@@ -90,7 +90,7 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
             context.registerReceiver(object : BroadcastReceiver() {
                 override fun onReceive(p0: Context?, p1: Intent?) {
                     val battery = p1?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
-                    if (oldBattery != battery) {
+                    if (battery != -1 && oldBattery != battery) {
                         oldBattery = battery
                         saveBatteryToFirebase(battery)
                     }
