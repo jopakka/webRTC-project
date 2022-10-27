@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.monitor.app.core.DataCommands
 import com.monitor.app.core.constants.Constants
 import com.monitor.app.data.rtcclient.AppSdpObserver
 import com.monitor.app.data.rtcclient.DataChannelObserver
@@ -71,8 +72,8 @@ class ControlSensorViewModel(private val userId: String, private val sensorId: S
         mRtcClient.value?.endCall(userId, sensorId, recall)
     }
 
-    fun sendData(data: String) {
-        mRtcClient.value?.sendData(data)
+    fun sendData(command: DataCommands) {
+        mRtcClient.value?.sendData(command)
     }
 }
 

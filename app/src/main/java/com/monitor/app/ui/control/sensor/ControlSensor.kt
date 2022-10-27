@@ -11,7 +11,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -19,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.monitor.app.R
+import com.monitor.app.core.DataCommands
 import com.monitor.app.core.components.KeepScreenOn
 import com.monitor.app.core.components.WebRTCVideoView
 
@@ -37,14 +37,9 @@ fun ControlSensorScreen(
     Scaffold(floatingActionButton = {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             FloatingActionButton(onClick = {
-                viewModel.sendData("camera")
+                viewModel.sendData(DataCommands.CAMERA)
             }) {
                 Icon(Icons.Filled.Camera, stringResource(R.string.description_change_camera))
-            }
-            FloatingActionButton(onClick = {
-                viewModel.sendData("flash")
-            }) {
-                Icon(Icons.Filled.FlashOn, stringResource(R.string.description_toggle_flash))
             }
         }
     }) {
