@@ -9,4 +9,5 @@ data class SensorInfo(
     @ServerTimestamp
     val createdAt: Date? = null,
     val id: String? = null,
+    val battery: Int? = null,
 )
