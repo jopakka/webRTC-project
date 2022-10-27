@@ -17,6 +17,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.monitor.app.R
 import com.monitor.app.core.components.LoadingIndicator
 import com.monitor.app.core.components.TextInputField
+import com.monitor.app.data.utils.DataStoreUtil
+import kotlinx.coroutines.launch
 
 @Composable
 fun SensorInitScreen(
@@ -32,6 +34,8 @@ fun SensorInitScreen(
     val errorToast =
         Toast.makeText(context, stringResource(R.string.error_create_sensor), Toast.LENGTH_SHORT)
     var loading by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val dataStore = DataStoreUtil(context)
 
     val onClick = {
         loading = true
@@ -41,7 +45,10 @@ fun SensorInitScreen(
                 errorToast.show()
                 return@addSensor
             }
-            onSensorAdded(id)
+            scope.launch {
+                dataStore.saveDeviceId(id)
+                onSensorAdded(id)
+            }
         }
     }
 
