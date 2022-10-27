@@ -86,16 +86,21 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
 
     fun saveBattery(context: Context) {
         var oldBattery: Int = -1
-        IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { iFilter ->
+        val batteryStatus = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { iFilter ->
             context.registerReceiver(object : BroadcastReceiver() {
                 override fun onReceive(p0: Context?, p1: Intent?) {
-                    val battery = p1?.getIntExtra(BatteryManager.EXTRA_LEVEL, 0) ?: return
+                    val battery = p1?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
                     if (oldBattery != battery) {
                         oldBattery = battery
                         saveBatteryToFirebase(battery)
                     }
                 }
             }, iFilter)
+        }
+        oldBattery =
+            batteryStatus?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+        if (oldBattery != -1) {
+            saveBatteryToFirebase(oldBattery)
         }
     }
 
