@@ -38,8 +38,11 @@ fun SensorMainScreen(
 ) {
     KeepScreenOn()
 
+    val context = LocalContext.current
+    viewModel.saveBattery(context)
+
     val permissions = listOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
-    val application = LocalContext.current.applicationContext as Application
+    val application = context.applicationContext as Application
     val permissionState = rememberMultiplePermissionsState(permissions = permissions)
 
     if (!permissionState.allPermissionsGranted) {
