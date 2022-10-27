@@ -85,10 +85,14 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
     }
 
     fun saveBattery(context: Context, delayTime: Long = 10_000) {
+        var batteryLevel: Int = -1
         viewModelScope.launch {
             while (true) {
-                val batteryLevel = getBatteryLevel(context)
-                saveBatteryToFirebase(batteryLevel)
+                val newBatteryLevel = getBatteryLevel(context)
+                if (batteryLevel != newBatteryLevel) {
+                    saveBatteryToFirebase(newBatteryLevel)
+                    batteryLevel = newBatteryLevel
+                }
                 delay(delayTime)
             }
         }
