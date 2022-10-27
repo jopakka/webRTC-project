@@ -1,12 +1,12 @@
 package com.monitor.app.ui.sensor.main
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.monitor.app.core.DataCommands
 import com.monitor.app.core.constants.Constants
 import com.monitor.app.data.rtcclient.AppSdpObserver
 import com.monitor.app.data.rtcclient.DataChannelObserver
@@ -44,10 +44,8 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
                     super.onMessage(p0)
                     val byteBuffer = p0?.data?.moveToByteArray() ?: ByteArray(0)
 
-                    when (String(byteBuffer)) {
-                        "flash" -> Log.d(TAG, "this should toggle flash")
-                        "camera" -> Log.d(TAG, "this switch cameras")
-                        else -> Log.d(TAG, "Unknown command")
+                    when (DataCommands.valueOf(String(byteBuffer))) {
+                        DataCommands.CAMERA -> switchCamera()
                     }
                 }
             }) {}

@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.monitor.app.core.DataCommands
 import org.webrtc.*
 import java.nio.ByteBuffer
 
@@ -260,7 +261,11 @@ class RTCClient(
         videoCapturer.switchCamera(null)
     }
 
-    fun sendData(data: String) {
-        dataChannel.send(DataChannel.Buffer(ByteBuffer.wrap(data.toByteArray()), false))
+    fun sendData(command: DataCommands) {
+        val commandString = command.toString()
+        val byteArray = commandString.toByteArray()
+        val byteBuffer = ByteBuffer.wrap(byteArray)
+        val buffer = DataChannel.Buffer(byteBuffer, false)
+        dataChannel.send(buffer)
     }
 }
