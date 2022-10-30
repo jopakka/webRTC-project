@@ -4,15 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -31,8 +28,6 @@ fun SensorListItem(
     titleWeight: FontWeight = FontWeight.Medium,
     subtitleColor: Color = MaterialTheme.colors.onSurface,
     borderShape: Shape = RoundedCornerShape(size = 10.dp),
-    icon: ImageVector = Icons.Default.CheckCircle,
-    iconColor: Color = Color.White
 ) {
 
     /*Card(modifier = Modifier
@@ -49,17 +44,17 @@ fun SensorListItem(
     Column(
         modifier = modifier
             .clip(borderShape)
-            .background(Color(0xFFE6E6E6))
+            .background(Color(0xFFF3F3F3))
     ) {
         Row(
-            modifier = modifier.background(Color(0xFFE39E37)),
+            modifier = modifier
+                .background(Color(0xFFE39E37))
+                .padding(horizontal = 18.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 modifier = modifier
-                    .weight(8f)
-                    .padding(start = 18.dp)
-                    .padding(vertical = 18.dp),
+                    .weight(8f),
                 text = sensorInfo.name.uppercase(),
                 style = TextStyle(
                     color = titleColor, fontSize = titleSize, fontWeight = titleWeight
@@ -67,25 +62,16 @@ fun SensorListItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            Icon(
-                modifier = modifier
-                    .padding(end = 18.dp)
-                    .padding(vertical = 18.dp),
-                imageVector = icon,
-                contentDescription = "Battery level",
-                tint = iconColor
-            )
+            BatteryLevel(batteryLevel = sensorInfo.battery)
         }
         Column(modifier = modifier.padding(all = 18.dp)) {
             Text(
-                modifier = modifier.padding(bottom = 4.dp),
                 text = "Description:",
                 style = TextStyle(
-                    color = subtitleColor, fontSize = MaterialTheme.typography.body1.fontSize
+                    color = subtitleColor, fontSize = MaterialTheme.typography.body2.fontSize
                 )
             )
             Text(
-
                 text = sensorInfo.info,
                 style = TextStyle(
                     color = subtitleColor, fontSize = MaterialTheme.typography.body1.fontSize
