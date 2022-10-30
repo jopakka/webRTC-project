@@ -17,7 +17,7 @@ import com.monitor.app.data.model.SensorInfo
 fun SensorList(sensors: List<SensorInfo>, itemOnClick: (id: String) -> Unit) {
     Surface(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+            modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(sensors) { sensor ->

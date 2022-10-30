@@ -1,6 +1,7 @@
 package com.monitor.app.core.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -30,21 +31,13 @@ fun SensorListItem(
     borderShape: Shape = RoundedCornerShape(size = 10.dp),
 ) {
 
-    /*Card(modifier = Modifier
-        .padding(all = 8.dp)
-        .fillMaxWidth(),
-        onClick = { onClick(sensorInfo.id ?: "") }) {
-        Column(modifier = Modifier.padding(all = 4.dp)) {
-            Text(text = sensorInfo.name, style = MaterialTheme.typography.subtitle1)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = sensorInfo.info, style = MaterialTheme.typography.subtitle1)
-        }
-    }*/
-
     Column(
         modifier = modifier
             .clip(borderShape)
             .background(Color(0xFFF3F3F3))
+            .clickable {
+                onClick(sensorInfo.id ?: "")
+            },
     ) {
         Row(
             modifier = modifier
