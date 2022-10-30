@@ -41,7 +41,7 @@ fun ControlMainScreen(
             ) {
                 Text(
                     text = "Camera devices",
-                    modifier = Modifier.padding(vertical = 30.dp),
+                    modifier = Modifier.padding(vertical = 20.dp),
                     style = MaterialTheme.typography.h4
                 )
                 SensorList(sensors = sensors) { id ->
