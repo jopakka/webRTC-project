@@ -11,6 +11,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.monitor.app.core.components.SensorList
@@ -30,7 +31,14 @@ fun ControlMainScreen(
     Constants.isCallEnded = true
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(text = "House Monitor System") }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "House Monitor System") },
+                backgroundColor = Color(0xFFE39E37),
+                contentColor = Color.White,
+                elevation = 10.dp
+            )
+        },
         content = {
             Column(
                 modifier = Modifier
