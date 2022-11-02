@@ -39,20 +39,20 @@ fun SelectableItem(
     modifier: Modifier = Modifier,
     selected: Boolean,
     title: String,
-    titleColor: Color = MaterialTheme.colors.primary.takeIf { selected }
-        ?: MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
+    titleColor: Color = Color(0xFFE39E37).takeIf { selected }
+        ?: MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
     titleSize: TextUnit = MaterialTheme.typography.h6.fontSize,
     titleWeight: FontWeight = FontWeight.Medium,
     subtitle: String? = null,
     subtitleColor: Color = MaterialTheme.colors.onSurface.takeIf { selected }
-        ?: MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
+        ?: MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
     borderWidth: Dp = 1.dp,
-    borderColor: Color = MaterialTheme.colors.primary.takeIf { selected }
-        ?: MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
+    borderColor: Color = Color(0xFFE39E37).takeIf { selected }
+        ?: MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
     borderShape: Shape = RoundedCornerShape(size = 10.dp),
     icon: ImageVector = Icons.Default.CheckCircle,
-    iconColor: Color = MaterialTheme.colors.primary.takeIf { selected }
-        ?: MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
+    iconColor: Color = Color(0xFFE39E37).takeIf { selected }
+        ?: MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
     onClick: (bool: Boolean) -> Unit
 ) {
     val scaleA = remember { Animatable(initialValue = 1f) }
