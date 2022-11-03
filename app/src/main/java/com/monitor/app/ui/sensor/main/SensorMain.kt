@@ -23,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.monitor.app.R
+import com.monitor.app.core.SensorStatuses
 import com.monitor.app.core.components.KeepScreenOn
 import com.monitor.app.core.components.WebRTCVideoView
 
@@ -45,20 +46,28 @@ fun SensorMainScreen(
     val application = context.applicationContext as Application
     val permissionState = rememberMultiplePermissionsState(permissions = permissions)
 
-    if (!permissionState.allPermissionsGranted) {
-        val lifecycleOwner = LocalLifecycleOwner.current
-        DisposableEffect(key1 = lifecycleOwner, effect = {
-            val observer = LifecycleEventObserver { _, event ->
-                if (event == Lifecycle.Event.ON_RESUME) {
-                    permissionState.launchMultiplePermissionRequest()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(key1 = lifecycleOwner, effect = {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    if (!permissionState.allPermissionsGranted) {
+                        permissionState.launchMultiplePermissionRequest()
+                    } else {
+                        viewModel.setStatus(SensorStatuses.ONLINE)
+                    }
                 }
+                Lifecycle.Event.ON_PAUSE -> viewModel.setStatus(SensorStatuses.OFFLINE)
+                else -> {}
             }
-            lifecycleOwner.lifecycle.addObserver(observer)
-            onDispose {
-                lifecycleOwner.lifecycle.removeObserver(observer)
-            }
-        })
-    } else {
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    })
+
+    if (permissionState.allPermissionsGranted) {
         Scaffold(floatingActionButton = {
             FloatingActionButton(onClick = {
                 viewModel.switchCamera()
@@ -66,9 +75,11 @@ fun SensorMainScreen(
                 Icon(Icons.Filled.Adjust, stringResource(R.string.description_change_camera))
             }
         }) {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(it)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)
+            ) {
                 WebRTCVideoView { videoView ->
                     viewModel.init(application, videoView)
                 }
