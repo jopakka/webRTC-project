@@ -19,6 +19,7 @@ class SensorInitViewModel(private val userId: String) : ViewModel() {
             val sensor = SensorInfo(name, info)
             firestore.collection(userId).add(sensor).addOnSuccessListener {
                 Log.d(TAG, "Sensor added successfully: ${it.id}")
+                firestore.collection(userId).document(it.id).update(mapOf("id" to it.id))
                 onComplete(it.id, null)
             }
         } catch (e: Error) {
