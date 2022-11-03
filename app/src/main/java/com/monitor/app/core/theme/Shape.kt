@@ -1,4 +1,4 @@
-package fi.joonasniemi.composematerial.ui.theme
+package com.monitor.app.core.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes
