@@ -6,6 +6,7 @@ import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.monitor.app.core.DataCommands
+import com.monitor.app.core.SensorStatuses
 import org.webrtc.*
 import java.nio.ByteBuffer
 
@@ -134,6 +135,7 @@ class RTCClient(
                             .update(offer as Map<String, *>)
                             .addOnSuccessListener {
                                 Log.d(TAG, "DocumentSnapshot added")
+                                setStatus(userID, sensorID, SensorStatuses.ONLINE)
                             }
                             .addOnFailureListener { e ->
                                 Log.e(TAG, "Error adding document", e)
@@ -202,6 +204,7 @@ class RTCClient(
     }
 
     fun endCall(userID: String, sensorID: String, reCall: Boolean) {
+        setStatus(userID, sensorID, SensorStatuses.OFFLINE)
         if (reCall) {
             val sdpObserver = object : AppSdpObserver() {}
             call(sdpObserver, userID, sensorID)
@@ -267,5 +270,12 @@ class RTCClient(
         val byteBuffer = ByteBuffer.wrap(byteArray)
         val buffer = DataChannel.Buffer(byteBuffer, false)
         dataChannel.send(buffer)
+    }
+
+    fun setStatus(userID: String, sensorID: String, status: SensorStatuses) {
+        val statusMap = mapOf("status" to status)
+        db.collection(userID).document(sensorID).update(statusMap).addOnSuccessListener {
+            Log.d(TAG, "Status updated successfully")
+        }
     }
 }

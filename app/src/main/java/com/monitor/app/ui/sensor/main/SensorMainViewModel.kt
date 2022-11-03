@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.monitor.app.core.DataCommands
+import com.monitor.app.core.SensorStatuses
 import com.monitor.app.core.constants.Constants
 import com.monitor.app.data.rtcclient.AppSdpObserver
 import com.monitor.app.data.rtcclient.DataChannelObserver
@@ -111,6 +112,10 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
         } catch (e: Exception) {
             Log.e(TAG, "saveBatteryToFirebase", e)
         }
+    }
+
+    fun setStatus(status: SensorStatuses) {
+        mRtcClient.value?.setStatus(userId, sensorId, status)
     }
 }
 
