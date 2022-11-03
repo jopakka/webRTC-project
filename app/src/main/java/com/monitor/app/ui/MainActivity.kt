@@ -3,7 +3,7 @@ package com.monitor.app.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import fi.joonasniemi.composematerial.ui.theme.HomeSecuritySystemTheme
+import com.monitor.app.core.theme.HomeSecuritySystemTheme
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
