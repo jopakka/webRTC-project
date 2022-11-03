@@ -4,14 +4,17 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.monitor.app.core.SensorStatuses
 import com.monitor.app.data.model.SensorInfo
 import java.util.*
 
 class ControlMainViewModel(private val userId: String) : ViewModel() {
     companion object {
-        private const val TAG = "TestViewModel"
+        private const val TAG = "ControlMainViewModel"
     }
 
     private val firestore = Firebase.firestore
@@ -31,28 +34,47 @@ class ControlMainViewModel(private val userId: String) : ViewModel() {
                     return@addSnapshotListener
                 }
 
-                _sensors.clear()
-
                 if (querySnapshot == null || querySnapshot.isEmpty) return@addSnapshotListener
 
-                for (snapshot in querySnapshot) {
-                    val data = snapshot.data
-                    val key = snapshot.id
-                    try {
-                        val info = SensorInfo(
-                            data["name"].toString(),
-                            data["info"].toString(),
-                            snapshot.getTimestamp("createdAt")?.toDate(),
-                            key
-                        )
-                        _sensors[key] = info
-                    } catch (e: Error) {
-                        Log.w(TAG, "${e.message}")
+                querySnapshot.documentChanges.forEach {
+                    val id = it.document.id
+                    when (it.type) {
+                        DocumentChange.Type.REMOVED -> {
+                            _sensors.remove(id)
+                        }
+                        else -> {
+                            val sensor = createSensorInfo(it.document) ?: return@forEach
+                            _sensors[id] = sensor
+                        }
                     }
                 }
             }
         } catch (e: Error) {
             Log.e(TAG, "${e.message}")
+        }
+    }
+
+    private fun createSensorInfo(snapshot: QueryDocumentSnapshot): SensorInfo? {
+        val data = snapshot.data
+        val key = snapshot.id
+        try {
+            val info = SensorInfo(
+                data["name"].toString(),
+                data["info"].toString(),
+                snapshot.getTimestamp("createdAt")?.toDate(),
+                key,
+                data["battery"].toString().toIntOrNull(),
+                when (data["status"].toString()) {
+                    SensorStatuses.OFFLINE.name -> SensorStatuses.OFFLINE
+                    SensorStatuses.ONLINE.name -> SensorStatuses.ONLINE
+                    else -> SensorStatuses.OFFLINE
+                },
+            )
+            Log.d(TAG, "sensor=$info")
+            return info
+        } catch (e: Error) {
+            Log.w(TAG, "${e.message}")
+            return null
         }
     }
 }
