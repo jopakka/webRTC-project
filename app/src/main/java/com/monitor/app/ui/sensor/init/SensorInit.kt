@@ -1,18 +1,17 @@
 package com.monitor.app.ui.sensor.init
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.monitor.app.R
 import com.monitor.app.core.components.LoadingIndicator
@@ -52,32 +51,59 @@ fun SensorInitScreen(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            stringResource(R.string.give_sensor_info),
-            style = MaterialTheme.typography.h4,
-            textAlign = TextAlign.Center
-        )
-        TextInputField(
-            stringResource(R.string.tf_name_title),
-            stringResource(R.string.tf_name_placeholder)
-        ) {
-            name = it
-        }
-        TextInputField(
-            stringResource(R.string.tf_info_title),
-            stringResource(R.string.tf_info_placeholder)
-        ) {
-            info = it
-        }
-        Button(onClick, enabled = name.isNotBlank() && !loading) {
-            Text(stringResource(R.string.ready))
-        }
-    }
-
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "House Monitor System") },
+                backgroundColor = Color(0xFFE39E37),
+                contentColor = Color.White,
+                elevation = 10.dp
+            )
+        },
+        content = { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    stringResource(R.string.give_sensor_info),
+                    style = MaterialTheme.typography.h4,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Column(modifier = Modifier.padding(horizontal = 60.dp, vertical = 40.dp)) {
+                    TextInputField(
+                        stringResource(R.string.tf_name_title),
+                        stringResource(R.string.tf_name_placeholder)
+                    ) {
+                        name = it
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    TextInputField(
+                        stringResource(R.string.tf_info_title),
+                        stringResource(R.string.tf_info_placeholder)
+                    ) {
+                        info = it
+                    }
+                }
+                Button(
+                    onClick, enabled = name.isNotBlank() && !loading,
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFE39E37)),
+                    shape = RoundedCornerShape(50.dp),
+                    modifier = Modifier
+                        .padding(horizontal = 60.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.ready),
+                        color = Color.White,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            }
+        })
     LoadingIndicator(loading)
 }
