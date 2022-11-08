@@ -46,7 +46,7 @@ fun SensorListItem(
         ) {
             Row(
                 modifier = modifier
-                    .background(Color(0xFFE39E37))
+                    .background(MaterialTheme.colors.primary)
                     .padding(horizontal = 18.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
