@@ -55,7 +55,6 @@ fun SensorInitScreen(
         topBar = {
             TopAppBar(
                 title = { Text(text = "House Monitor System") },
-                backgroundColor = Color(0xFFE39E37),
                 contentColor = Color.White,
                 elevation = 10.dp
             )
@@ -91,7 +90,6 @@ fun SensorInitScreen(
                 }
                 Button(
                     onClick, enabled = name.isNotBlank() && !loading,
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFE39E37)),
                     shape = RoundedCornerShape(50.dp),
                     modifier = Modifier
                         .padding(horizontal = 60.dp)

@@ -28,8 +28,6 @@ fun DeviceTypeView(onDeviceSelected: (isMain: Boolean) -> Unit) {
         topBar = {
             TopAppBar(
                 title = { Text(text = "House Monitor System") },
-                backgroundColor = Color(0xFFE39E37),
-                contentColor = Color.White,
                 elevation = 10.dp
             )
         },
@@ -73,7 +71,6 @@ fun DeviceTypeView(onDeviceSelected: (isMain: Boolean) -> Unit) {
                     }
                 },
                     enabled = deviceTypeIsMain?.let { true } ?: false,
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFE39E37)),
                     shape = RoundedCornerShape(50.dp),
                     modifier = Modifier
                         .padding(horizontal = 60.dp)
