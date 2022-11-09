@@ -6,10 +6,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import com.monitor.app.core.DeviceTypes
 import com.monitor.app.data.utils.DataStoreUtil
 
 @Composable
-fun GetDataStoreValues(onDataStoreFound: (isMain: Boolean, id: String?) -> Unit) {
+fun GetDataStoreValues(onDataStoreFound: (deviceType: DeviceTypes, id: String) -> Unit) {
     val context = LocalContext.current
     val dataStore = DataStoreUtil(context)
     val savedDeviceTypeIsMain by dataStore.getDeviceType.collectAsState(initial = null)
@@ -24,6 +25,8 @@ fun GetDataStoreValues(onDataStoreFound: (isMain: Boolean, id: String?) -> Unit)
             "GetDataStoreValues",
             "savedDeviceTypeIsMain=$savedDeviceTypeIsMain; savedSensorId=$savedSensorId"
         )
-        onDataStoreFound(savedDeviceTypeIsMain == true, savedSensorId)
+        if (savedDeviceTypeIsMain != null && savedSensorId != null) {
+            onDataStoreFound(savedDeviceTypeIsMain!!, savedSensorId!!)
+        }
     }
 }

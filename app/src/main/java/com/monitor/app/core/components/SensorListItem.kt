@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import com.monitor.app.data.model.SensorInfo
+import com.monitor.app.data.rtcclient.model.SensorInfo
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

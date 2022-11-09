@@ -9,7 +9,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.monitor.app.core.SensorStatuses
-import com.monitor.app.data.model.SensorInfo
+import com.monitor.app.data.rtcclient.model.SensorInfo
 import java.util.*
 
 class ControlMainViewModel(private val userId: String) : ViewModel() {

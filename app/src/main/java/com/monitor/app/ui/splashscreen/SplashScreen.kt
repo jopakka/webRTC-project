@@ -12,12 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.monitor.app.R
+import com.monitor.app.core.DeviceTypes
 import com.monitor.app.core.components.GetDataStoreValues
 
 @Composable
-fun SplashScreen(onDataStore: (isMain: Boolean, sensorId: String?) -> Unit) {
-    GetDataStoreValues { isMain, id ->
-        onDataStore(isMain, id)
+fun SplashScreen(onDataStore: (deviceType: DeviceTypes, sensorId: String) -> Unit) {
+    GetDataStoreValues { deviceType, id ->
+        onDataStore(deviceType, id)
     }
 
     Column(
