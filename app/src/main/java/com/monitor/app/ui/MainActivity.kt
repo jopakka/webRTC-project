@@ -12,7 +12,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             HomeSecuritySystemTheme(false) {
-                AppNavHost()
+                AppNavHost(this)
             }
         }
     }

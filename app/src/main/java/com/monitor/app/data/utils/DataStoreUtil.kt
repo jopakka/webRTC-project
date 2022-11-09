@@ -3,8 +3,13 @@ package com.monitor.app.data.utils
 import android.content.Context
 import android.util.Log
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.google.gson.Gson
+import com.monitor.app.core.DeviceTypes
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -15,12 +20,12 @@ class DataStoreUtil(private val context: Context) {
     // to make sure there's only one instance
     companion object {
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("config")
-        private val IS_MAIN_DEVICE = booleanPreferencesKey("is_main_device")
+        private val DEVICE_TYPE = stringPreferencesKey("device_type")
         private val SENSOR_ID = stringPreferencesKey("sensor_id")
     }
 
     //get the saved device type
-    val getDeviceType: Flow<Boolean?> = context.dataStore.data
+    val getDeviceType: Flow<DeviceTypes> = context.dataStore.data
         .catch { exception ->
             // dataStore.data throws an IOException when an error is encountered when reading data
             if (exception is IOException) {
@@ -31,7 +36,11 @@ class DataStoreUtil(private val context: Context) {
             }
         }
         .map {
-            it[IS_MAIN_DEVICE]
+            val json = it[DEVICE_TYPE]
+            when (val deviceType = Gson().fromJson(json, DeviceTypes::class.java)) {
+                null -> DeviceTypes.NONE
+                else -> deviceType
+            }
         }
 
     //get the saved sensor id
@@ -46,14 +55,18 @@ class DataStoreUtil(private val context: Context) {
             }
         }
         .map {
-            it[SENSOR_ID]
+            when (val id = it[SENSOR_ID]) {
+                null -> ""
+                else -> id
+            }
         }
 
     //save sensor id into datastore
-    suspend fun saveDeviceType(isMainDevice: Boolean) {
+    suspend fun saveDeviceType(deviceType: DeviceTypes) {
         try {
             context.dataStore.edit { preferences ->
-                preferences[IS_MAIN_DEVICE] = isMainDevice
+                val json = Gson().toJson(deviceType)
+                preferences[DEVICE_TYPE] = json
             }
         } catch (e: IOException) {
             Log.e("DataStoreUtil", "Could not write data", e)
