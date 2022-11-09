@@ -39,7 +39,7 @@ fun SelectableItem(
     modifier: Modifier = Modifier,
     selected: Boolean,
     title: String,
-    titleColor: Color = Color(0xFFE39E37).takeIf { selected }
+    titleColor: Color = MaterialTheme.colors.primary.takeIf { selected }
         ?: MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
     titleSize: TextUnit = MaterialTheme.typography.h6.fontSize,
     titleWeight: FontWeight = FontWeight.Medium,
@@ -47,11 +47,11 @@ fun SelectableItem(
     subtitleColor: Color = MaterialTheme.colors.onSurface.takeIf { selected }
         ?: MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
     borderWidth: Dp = 1.dp,
-    borderColor: Color = Color(0xFFE39E37).takeIf { selected }
+    borderColor: Color = MaterialTheme.colors.primary.takeIf { selected }
         ?: MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
     borderShape: Shape = RoundedCornerShape(size = 10.dp),
     icon: ImageVector = Icons.Default.CheckCircle,
-    iconColor: Color = Color(0xFFE39E37).takeIf { selected }
+    iconColor: Color = MaterialTheme.colors.primary.takeIf { selected }
         ?: MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
     onClick: (bool: Boolean) -> Unit
 ) {
