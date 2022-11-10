@@ -23,7 +23,7 @@ fun BatteryLevel(batteryLevel: Int?) {
             tint = Color.White
         )
         Text(
-            text = "67 %",
+            text = "${batteryLevel ?: 0} %",
             style = TextStyle(
                 color = Color.White,
                 fontWeight = FontWeight.Medium,
