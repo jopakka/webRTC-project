@@ -1,4 +1,4 @@
-package com.monitor.app.data.model
+package com.monitor.app.data.rtcclient.model
 
 class SampleData {
     companion object {

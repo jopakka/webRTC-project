@@ -21,7 +21,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             HomeSecuritySystemTheme(false) {
                 //*LoginScreen(auth)
-                AppNavHost()
+                AppNavHost(this)
+
             }
         }
     }

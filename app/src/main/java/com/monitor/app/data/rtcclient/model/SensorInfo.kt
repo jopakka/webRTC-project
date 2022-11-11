@@ -1,4 +1,4 @@
-package com.monitor.app.data.model
+package com.monitor.app.data.rtcclient.model
 
 import com.google.firebase.firestore.ServerTimestamp
 import com.monitor.app.core.SensorStatuses
