@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import com.monitor.app.data.model.SensorInfo
+import com.monitor.app.data.rtcclient.model.SensorInfo
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -46,7 +46,7 @@ fun SensorListItem(
         ) {
             Row(
                 modifier = modifier
-                    .background(Color(0xFFE39E37))
+                    .background(MaterialTheme.colors.primary)
                     .padding(horizontal = 18.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {

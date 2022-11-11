@@ -10,8 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.monitor.app.data.model.SampleData
-import com.monitor.app.data.model.SensorInfo
+import com.monitor.app.data.rtcclient.model.SampleData
+import com.monitor.app.data.rtcclient.model.SensorInfo
 
 @Composable
 fun SensorList(sensors: List<SensorInfo>, itemOnClick: (id: String) -> Unit) {

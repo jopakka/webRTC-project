@@ -1,11 +1,13 @@
 package com.monitor.app.ui
 
+import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.monitor.app.core.DeviceTypes
 import com.monitor.app.core.Screens
 import com.monitor.app.ui.control.main.ControlMainScreen
 import com.monitor.app.ui.control.sensor.ControlSensorScreen
@@ -16,28 +18,44 @@ import com.monitor.app.ui.splashscreen.SplashScreen
 
 @Composable
 fun AppNavHost(
+    activity: Activity,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
 ) {
+    val TAG = "AppNavHost"
     val user = "user-1"
     NavHost(
         modifier = modifier, navController = navController, startDestination = Screens.SPLASH.name
     ) {
         composable(Screens.SPLASH.name) {
-            SplashScreen { isMain, sensorId ->
-                navController.navigate(
-                    if (isMain)
-                        Screens.CONTROL_MAIN.name
-                    else if (sensorId != null) "${Screens.SENSOR_SEND.name}/$sensorId"
-                    else Screens.DEVICE_TYPE_VIEW.name
-                )
+            SplashScreen { deviceType, sensorId ->
+                val navDir = when (deviceType) {
+                    DeviceTypes.NONE -> Screens.DEVICE_TYPE_VIEW.name
+                    DeviceTypes.MAIN -> Screens.CONTROL_MAIN.name
+                    DeviceTypes.SENSOR -> {
+                        if (sensorId.isNotBlank()) {
+                            "${Screens.SENSOR_SEND.name}/$sensorId"
+                        } else {
+                            Screens.DEVICE_TYPE_VIEW.name
+                        }
+                    }
+                }
+                navController.navigate(navDir) {
+                    popUpTo(Screens.SPLASH.name) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
             }
         }
         composable(Screens.DEVICE_TYPE_VIEW.name) {
-            DeviceTypeView { isMain ->
+            DeviceTypeView { deviceType ->
                 navController.navigate(
-                    if (isMain) Screens.CONTROL_MAIN.name
-                    else Screens.SENSOR_INIT.name
+                    when (deviceType) {
+                        DeviceTypes.SENSOR -> Screens.SENSOR_INIT.name
+                        DeviceTypes.MAIN -> Screens.CONTROL_MAIN.name
+                        else -> return@DeviceTypeView
+                    }
                 )
             }
         }
@@ -54,7 +72,7 @@ fun AppNavHost(
         composable("${Screens.SENSOR_SEND.name}/{sensorID}") {
             val sensor = it.arguments?.getString("sensorID") ?: return@composable
             SensorMainScreen(user, sensor) {
-                navController.navigateUp()
+                activity.finish()
             }
         }
         composable("${Screens.SENSOR_VIEW.name}/{sensorID}") {

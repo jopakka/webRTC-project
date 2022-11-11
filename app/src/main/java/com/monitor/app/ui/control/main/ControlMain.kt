@@ -34,7 +34,6 @@ fun ControlMainScreen(
         topBar = {
             TopAppBar(
                 title = { Text(text = "House Monitor System") },
-                backgroundColor = Color(0xFFE39E37),
                 contentColor = Color.White,
                 elevation = 10.dp
             )

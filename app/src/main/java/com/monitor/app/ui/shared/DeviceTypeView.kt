@@ -12,24 +12,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.monitor.app.R
+import com.monitor.app.core.DeviceTypes
 import com.monitor.app.core.components.SelectableItem
 import com.monitor.app.data.utils.DataStoreUtil
 import kotlinx.coroutines.launch
 
 @Composable
-fun DeviceTypeView(onDeviceSelected: (isMain: Boolean) -> Unit) {
+fun DeviceTypeView(onDeviceSelected: (isMain: DeviceTypes) -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val dataStore = DataStoreUtil(context)
 
-    var deviceTypeIsMain: Boolean? by remember { mutableStateOf(null) }
+    var deviceType: DeviceTypes? by remember { mutableStateOf(null) }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(text = "House Monitor System") },
-                backgroundColor = Color(0xFFE39E37),
-                contentColor = Color.White,
                 elevation = 10.dp
             )
         },
@@ -49,31 +48,30 @@ fun DeviceTypeView(onDeviceSelected: (isMain: Boolean) -> Unit) {
                 )
                 Column(modifier = Modifier.padding(horizontal = 60.dp, vertical = 40.dp)) {
                     SelectableItem(
-                        selected = deviceTypeIsMain ?: false,
+                        selected = deviceType == DeviceTypes.MAIN,
                         title = stringResource(R.string.device_main),
                         subtitle = stringResource(R.string.device_main_info)
                     ) {
-                        deviceTypeIsMain = it
+                        deviceType = DeviceTypes.MAIN
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     SelectableItem(
-                        selected = deviceTypeIsMain?.let { !it } ?: false,
+                        selected = deviceType == DeviceTypes.SENSOR,
                         title = stringResource(R.string.device_sensor),
                         subtitle = stringResource(R.string.device_sensor_info)
                     ) {
-                        deviceTypeIsMain = !it
+                        deviceType = DeviceTypes.SENSOR
                     }
                 }
 
                 Button(onClick = {
                     scope.launch {
-                        val isMain = deviceTypeIsMain ?: return@launch
-                        dataStore.saveDeviceType(isMain)
-                        onDeviceSelected(isMain)
+                        deviceType ?: return@launch
+                        dataStore.saveDeviceType(deviceType!!)
+                        onDeviceSelected(deviceType!!)
                     }
                 },
-                    enabled = deviceTypeIsMain?.let { true } ?: false,
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFE39E37)),
+                    enabled = deviceType?.let { true } ?: false,
                     shape = RoundedCornerShape(50.dp),
                     modifier = Modifier
                         .padding(horizontal = 60.dp)
