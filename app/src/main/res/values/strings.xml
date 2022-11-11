@@ -7,6 +7,7 @@
     <string name="sensors">Sensors</string>
     <string name="next">Next</string>
 
+
     <string name="error_create_sensor">Error while creating sensor. Please try again.</string>
     <string name="give_sensor_info">Give sensor information</string>
     <string name="tf_name_title">Name</string>
@@ -20,4 +21,14 @@
     <string name="device_sensor_info">Choose this if this device is going to be used as security camera</string>
 
     <string name="description_change_camera">Change camera</string>
+    <string name="retype_your_password">Retype Your Password</string>
+
+
+    <string name="create_an_account">Create An Account</string>
+    <string name="email_adress">Email Adress</string>
+    <string name="password">Password</string>
+    <string name="continue_google">Continue with google</string>
+    <string name="already_have_an_account">Already have and account?</string>
+
+
 </resources>
