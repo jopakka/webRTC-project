@@ -2,6 +2,7 @@ package com.monitor.app.ui.autentication
 
 import android.util.Log
 import android.util.Patterns
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,7 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -29,20 +32,18 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import com.monitor.app.core.theme.HomeSecuritySystemTheme
+import com.monitor.app.R
 
 
 @Composable
-fun LoginScreen(auth: FirebaseAuth) {
+fun LoginScreen(auth: FirebaseAuth, onLogin: (userId: String) -> Unit) {
 
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
 
     var email by remember {
         mutableStateOf("")
     }
-
 
     var password by remember {
         mutableStateOf("")
@@ -74,21 +75,15 @@ fun LoginScreen(auth: FirebaseAuth) {
             fontStyle = FontStyle.Italic,
             fontSize = 32.sp,
             modifier = Modifier.padding(top = 16.dp)
-
-
         )
 
-
-
         Text(
-            text = "House Monitoring System",
+            text = stringResource(R.string.app_name),
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.Bold,
             fontStyle = FontStyle.Italic,
             fontSize = 32.sp,
             modifier = Modifier.padding(bottom = 16.dp)
-
-
         )
 
         Card(
@@ -97,17 +92,18 @@ fun LoginScreen(auth: FirebaseAuth) {
                 .padding(horizontal = 8.dp),
             shape = RoundedCornerShape(16.dp),
             border = BorderStroke(1.dp, Color.Black)
-        ){
+        ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(all = 10.dp)
             ) {
-                OutlinedTextField(value = email,
+                OutlinedTextField(
+                    value = email,
                     onValueChange = { email = it },
 
                     label = { Text(text = "Email Address") },
-                    placeholder = { Text(text = "abc@gmail.com")},
+                    placeholder = { Text(text = "abc@gmail.com") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
@@ -115,17 +111,16 @@ fun LoginScreen(auth: FirebaseAuth) {
                         imeAction = ImeAction.Next
                     ),
                     keyboardActions = KeyboardActions(
-                        onNext = {focusManager.moveFocus(FocusDirection.Down)}
+                        onNext = { focusManager.moveFocus(FocusDirection.Down) }
                     ),
                     isError = !isEmailValid,
                     trailingIcon = {
                         if (email.isNotBlank()) {
-                            IconButton(onClick = { email = ""}) {
+                            IconButton(onClick = { email = "" }) {
                                 Icon(
                                     imageVector = Icons.Filled.Clear,
                                     contentDescription = "Clear email"
                                 )
-
                             }
                         }
                     },
@@ -133,7 +128,6 @@ fun LoginScreen(auth: FirebaseAuth) {
 
                 OutlinedTextField(value = password,
                     onValueChange = { password = it },
-
                     label = { Text(text = "Password") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
@@ -142,38 +136,54 @@ fun LoginScreen(auth: FirebaseAuth) {
                         imeAction = ImeAction.Done
                     ),
                     keyboardActions = KeyboardActions(
-                        onDone = {focusManager.clearFocus()}
+                        onDone = { focusManager.clearFocus() }
                     ),
                     isError = !isPasswordValid,
                     trailingIcon = {
-                        IconButton(onClick = { isPasswordVisible = !isPasswordVisible}){
-                            Icon(imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                contentDescription = "Toggle Password visibility")
+                        IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                            Icon(
+                                imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                contentDescription = "Toggle Password visibility"
+                            )
                         }
                     },
-                    visualTransformation = if(isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation()
+                    visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation()
                 )
 
-                Button(onClick = {
-                                 auth.signInWithEmailAndPassword(email, password)
-                                     .addOnCompleteListener{
-                                         Log.d("asd", "testi")
-                                     }
-                },
+                Button(
+                    onClick = {
+                        auth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener {
+                                if (it.isSuccessful) {
+                                    Log.d("AUTH", "user: ${auth.currentUser?.email}")
+                                    onLogin(auth.currentUser?.uid!!)
+                                } else {
+                                    Log.w("AUTH", "${it.exception}")
+                                    Toast.makeText(
+                                        context,
+                                        "Invalid email or password",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
-                    enabled = isEmailValid && isPasswordValid) {
-                    Text(text = "Log in",
+                    enabled = isEmailValid && isPasswordValid
+                ) {
+                    Text(
+                        text = "Log in",
                         fontWeight = FontWeight.Bold,
                         color = Color.Black,
-                        fontSize = 16.sp)
+                        fontSize = 16.sp
+                    )
                 }
             }
         }
         Row(
             horizontalArrangement = Arrangement.End,
             modifier = Modifier.fillMaxWidth()
-        ){
+        ) {
             TextButton(onClick = {}) {
                 Text(
                     color = Color.Black,
@@ -191,7 +201,7 @@ fun LoginScreen(auth: FirebaseAuth) {
                 .fillMaxWidth()
                 .padding(all = 16.dp),
             colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
-        ){
+        ) {
             Text(
                 text = "Register",
                 fontWeight = FontWeight.Bold,
@@ -200,13 +210,12 @@ fun LoginScreen(auth: FirebaseAuth) {
             )
         }
     }
-
 }
 
 
-@Composable
-fun DefaultPreview(){
-    HomeSecuritySystemTheme {
-        LoginScreen(Firebase.auth)
-    }
-}
+//@Composable
+//fun DefaultPreview() {
+//    HomeSecuritySystemTheme {
+//        LoginScreen(Firebase.auth)
+//    }
+//}
