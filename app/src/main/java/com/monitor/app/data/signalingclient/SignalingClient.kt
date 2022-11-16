@@ -77,11 +77,10 @@ class SignalingClient(
                         ) {
                             listener.onCallEnded()
                             SDPtype = "End Call"
-
                         }
-                        Log.d(TAG, "Current data: ${snapshot.data}")
+//                        Log.d(TAG, "Current data: ${snapshot.data}")
                     } else {
-                        Log.d(TAG, "Current data: null")
+//                        Log.d(TAG, "Current data: null")
                     }
                 }
             db.collection(userID).document(sensorID)

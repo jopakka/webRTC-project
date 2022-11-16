@@ -18,7 +18,7 @@ open class AppSdpObserver : SdpObserver {
     }
 
     override fun onCreateSuccess(p0: SessionDescription?) {
-        Log.d(TAG, "onCreateSuccess: $p0")
+        Log.d(TAG, "onCreateSuccess: ${p0?.type}")
     }
 
     override fun onCreateFailure(p0: String?) {
