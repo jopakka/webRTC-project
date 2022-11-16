@@ -17,6 +17,7 @@ import com.monitor.app.data.signalingclient.SignalingClientObserver
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
+import org.webrtc.SessionDescription
 import org.webrtc.SurfaceViewRenderer
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -29,7 +30,15 @@ class ControlSensorViewModel(private val userId: String, private val sensorId: S
     private val mRtcClient = mutableStateOf<RTCClient?>(null)
     private val mSignalingClient = mutableStateOf<SignalingClient?>(null)
     private var isInitialized by mutableStateOf(false)
-    private val sdpObserver = object : AppSdpObserver() {}
+    var isLoading by mutableStateOf(true)
+        private set
+
+    private val sdpObserver = object : AppSdpObserver() {
+        override fun onCreateSuccess(p0: SessionDescription?) {
+            super.onCreateSuccess(p0)
+            isLoading = false
+        }
+    }
 
     fun init(application: Application, videoView: SurfaceViewRenderer) {
         if (isInitialized) {
