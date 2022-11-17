@@ -12,4 +12,5 @@ data class SensorInfo(
     val id: String? = null,
     val battery: Int? = null,
     val status: SensorStatuses = SensorStatuses.OFFLINE,
+    val canJoin: Boolean = false,
 )
