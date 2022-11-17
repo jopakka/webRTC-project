@@ -58,17 +58,19 @@ class ControlMainViewModel(private val userId: String) : ViewModel() {
         val data = snapshot.data
         val key = snapshot.id
         try {
+            val status = when (data["status"].toString()) {
+                SensorStatuses.OFFLINE.name -> SensorStatuses.OFFLINE
+                SensorStatuses.ONLINE.name -> SensorStatuses.ONLINE
+                else -> SensorStatuses.OFFLINE
+            }
             val info = SensorInfo(
                 data["name"].toString(),
                 data["info"].toString(),
                 snapshot.getTimestamp("createdAt")?.toDate(),
                 key,
                 data["battery"].toString().toIntOrNull(),
-                when (data["status"].toString()) {
-                    SensorStatuses.OFFLINE.name -> SensorStatuses.OFFLINE
-                    SensorStatuses.ONLINE.name -> SensorStatuses.ONLINE
-                    else -> SensorStatuses.OFFLINE
-                },
+                status,
+                status == SensorStatuses.ONLINE && data["type"].toString() == "OFFER",
             )
             Log.d(TAG, "sensor=$info")
             return info

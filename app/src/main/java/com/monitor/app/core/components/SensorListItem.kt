@@ -8,6 +8,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -40,9 +41,10 @@ fun SensorListItem(
             modifier = modifier
                 .clip(borderShape)
                 .background(Color(0xFFF3F3F3))
-                .clickable {
+                .clickable(sensorInfo.canJoin) {
                     onClick(sensorInfo.id ?: "")
-                },
+                }
+                .alpha(if (sensorInfo.canJoin) 1f else 0.4f),
         ) {
             Row(
                 modifier = modifier
