@@ -7,7 +7,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.monitor.app.core.DataCommands
-import com.monitor.app.core.constants.Constants
 import com.monitor.app.data.rtcclient.AppSdpObserver
 import com.monitor.app.data.rtcclient.DataChannelObserver
 import com.monitor.app.data.rtcclient.PeerConnectionObserver
@@ -32,11 +31,14 @@ class ControlSensorViewModel(private val userId: String, private val sensorId: S
     private var isInitialized by mutableStateOf(false)
     var isLoading by mutableStateOf(true)
         private set
+    var callEnded by mutableStateOf(false)
+        private set
 
     private val sdpObserver = object : AppSdpObserver() {
         override fun onCreateSuccess(p0: SessionDescription?) {
             super.onCreateSuccess(p0)
             isLoading = false
+            callEnded = false
         }
     }
 
@@ -70,14 +72,13 @@ class ControlSensorViewModel(private val userId: String, private val sensorId: S
             object : SignalingClientObserver(mRtcClient.value, sdpObserver, userId, sensorId) {
                 override fun onCallEnded() {
                     super.onCallEnded()
-                    if (Constants.selfEndedCall) return
                     endCall()
                 }
             })
     }
 
     fun endCall(recall: Boolean = false) {
-        Constants.selfEndedCall = !recall
+        callEnded = true
         mRtcClient.value?.endCall(userId, sensorId, recall)
     }
 

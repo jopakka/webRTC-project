@@ -2,6 +2,7 @@ package com.monitor.app.ui.sensor.main
 
 import android.Manifest
 import android.app.Application
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,7 +11,7 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Adjust
+import androidx.compose.material.icons.filled.Camera
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
@@ -40,7 +41,6 @@ fun SensorMainScreen(
     KeepScreenOn()
 
     val context = LocalContext.current
-    viewModel.saveBattery(context)
 
     val permissions = listOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
     val application = context.applicationContext as Application
@@ -49,15 +49,20 @@ fun SensorMainScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(key1 = lifecycleOwner, effect = {
         val observer = LifecycleEventObserver { _, event ->
+            Log.d("SensorMain", event.name)
             when (event) {
                 Lifecycle.Event.ON_RESUME -> {
                     if (!permissionState.allPermissionsGranted) {
                         permissionState.launchMultiplePermissionRequest()
                     } else {
                         viewModel.setStatus(SensorStatuses.ONLINE)
+                        viewModel.saveBattery(context)
                     }
                 }
-                Lifecycle.Event.ON_PAUSE -> viewModel.setStatus(SensorStatuses.OFFLINE)
+                Lifecycle.Event.ON_PAUSE -> {
+                    viewModel.setStatus(SensorStatuses.OFFLINE)
+                    viewModel.unregisterBatteryReceiver(context)
+                }
                 else -> {}
             }
         }
@@ -72,7 +77,7 @@ fun SensorMainScreen(
             FloatingActionButton(onClick = {
                 viewModel.switchCamera()
             }) {
-                Icon(Icons.Filled.Adjust, stringResource(R.string.description_change_camera))
+                Icon(Icons.Filled.Camera, stringResource(R.string.description_change_camera))
             }
         }) {
             Column(

@@ -1,6 +1,7 @@
 package com.monitor.app.ui.control.sensor
 
 import android.app.Application
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.monitor.app.R
 import com.monitor.app.core.DataCommands
+import com.monitor.app.core.components.AlertDialogOk
 import com.monitor.app.core.components.KeepScreenOn
 import com.monitor.app.core.components.WebRTCVideoView
 
@@ -68,6 +70,16 @@ fun ControlSensorScreen(
             WebRTCVideoView { videoView ->
                 viewModel.init(application, videoView)
             }
+        }
+    }
+
+    if (viewModel.callEnded) {
+        Log.d("ControlSensor", "viewModel.callEnded=${viewModel.callEnded}")
+        AlertDialogOk(
+            title = stringResource(R.string.call_ended),
+        ) {
+            viewModel.endCall()
+            onNavigateBack()
         }
     }
 
