@@ -1,21 +1,23 @@
 package com.monitor.app.ui.sensor.init
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.monitor.app.R
-import com.monitor.app.core.components.LoadingIndicator
-import com.monitor.app.core.components.TextInputField
+import com.monitor.app.core.components.*
 import com.monitor.app.data.utils.DataStoreUtil
 import kotlinx.coroutines.launch
 
@@ -54,7 +56,7 @@ fun SensorInitScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "House Monitor System") },
+                title = { Text(text = stringResource(id = R.string.app_name)) },
                 contentColor = Color.White,
                 elevation = 10.dp
             )
@@ -64,42 +66,37 @@ fun SensorInitScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text(
-                    stringResource(R.string.give_sensor_info),
-                    style = MaterialTheme.typography.h4,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Column(modifier = Modifier.padding(horizontal = 60.dp, vertical = 40.dp)) {
-                    TextInputField(
-                        stringResource(R.string.tf_name_title),
-                        stringResource(R.string.tf_name_placeholder)
+                Title(text = stringResource(R.string.give_sensor_info))
+                MCard {
+                    Column(
+                        modifier = Modifier.padding(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        name = it
+                        TextInputField(
+                            value = name,
+                            label = stringResource(R.string.tf_name_title),
+                            placeholder = stringResource(R.string.tf_name_placeholder),
+                            onChange = {
+                                name = it
+                            }
+                        )
+                        TextInputField(
+                            value = info,
+                            label = stringResource(R.string.tf_info_title),
+                            placeholder = stringResource(R.string.tf_info_placeholder),
+                            onChange = {
+                                info = it
+                            }
+                        )
+                        MButton(
+                            text = stringResource(R.string.ready),
+                            enabled = name.isNotBlank() && !loading,
+                            onClick = onClick,
+                        )
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
-                    TextInputField(
-                        stringResource(R.string.tf_info_title),
-                        stringResource(R.string.tf_info_placeholder)
-                    ) {
-                        info = it
-                    }
-                }
-                Button(
-                    onClick, enabled = name.isNotBlank() && !loading,
-                    shape = RoundedCornerShape(50.dp),
-                    modifier = Modifier
-                        .padding(horizontal = 60.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        text = stringResource(R.string.ready),
-                        color = Color.White,
-                        modifier = Modifier.padding(8.dp)
-                    )
                 }
             }
         })

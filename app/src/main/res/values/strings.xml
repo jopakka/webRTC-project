@@ -6,7 +6,12 @@
     <string name="ready">Ready</string>
     <string name="sensors">Sensors</string>
     <string name="next">Next</string>
+    <string name="ok">OK</string>
+    <string name="camera_devices">Camera devices</string>
+    <string name="placeholder_email">abc@gmail.com</string>
+    <string name="placeholder_password">Password</string>
 
+    <string name="error_invalid_email_or_password">"Invalid email or password"</string>
 
     <string name="error_create_sensor">Error while creating sensor. Please try again.</string>
     <string name="give_sensor_info">Give sensor information</string>
@@ -23,12 +28,11 @@
     <string name="description_change_camera">Change camera</string>
     <string name="retype_your_password">Retype Your Password</string>
 
-
     <string name="create_an_account">Create An Account</string>
     <string name="email_address">Email Address</string>
     <string name="password">Password</string>
     <string name="continue_google">Continue with google</string>
     <string name="already_have_an_account">Already have and account?</string>
 
-
+    <string name="call_ended">Call ended</string>
 </resources>

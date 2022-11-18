@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -91,7 +92,9 @@ fun SelectableItem(
         .clip(borderShape)
         .clickable {
             onClick(true)
-        }) {
+        }
+        .background(Color.White)
+    ) {
         Row(
             modifier = modifier.padding(start = 12.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -101,9 +104,10 @@ fun SelectableItem(
                     color = titleColor, fontSize = titleSize, fontWeight = titleWeight
                 ), maxLines = 1, overflow = TextOverflow.Ellipsis
             )
-            IconButton(modifier = modifier
-                .weight(2f)
-                .scale(scale = scaleA.value),
+            IconButton(
+                modifier = modifier
+                    .weight(2f)
+                    .scale(scale = scaleA.value),
                 onClick = { onClick(true) }) {
                 Icon(
                     imageVector = icon,

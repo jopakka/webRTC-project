@@ -83,8 +83,8 @@ class RTCClient(
     private fun getVideoCapturer(context: Context) =
         Camera2Enumerator(context).run {
             deviceNames.find {
-//                isFrontFacing(it)
-                it == deviceNames.last()
+                !isFrontFacing(it)
+//                it == deviceNames.last()
             }?.let {
                 createCapturer(it, null)
             } ?: throw IllegalStateException()

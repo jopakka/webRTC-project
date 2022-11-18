@@ -31,7 +31,7 @@ import org.webrtc.SurfaceViewRenderer
 @OptIn(ExperimentalCoroutinesApi::class)
 class SensorMainViewModel(private val userId: String, private val sensorId: String) : ViewModel() {
     companion object {
-        private const val TAG = "SensorSendViewModel"
+        private const val TAG = "SensorMainViewModel"
     }
 
     private val mRtcClient = mutableStateOf<RTCClient?>(null)
@@ -39,6 +39,7 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
     private var isInitialized by mutableStateOf(false)
     private val sdpObserver = object : AppSdpObserver() {}
     private val firestore = Firebase.firestore
+    private var batteryReceiver: BroadcastReceiver? = null
 
     fun init(application: Application, videoView: SurfaceViewRenderer) {
         if (isInitialized) {
@@ -69,7 +70,8 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
             object : SignalingClientObserver(mRtcClient.value, sdpObserver, userId, sensorId) {
                 override fun onCallEnded() {
                     super.onCallEnded()
-                    if (Constants.selfEndedCall) return
+                    Log.d(TAG, "onCallEnded selfEndedCall=${Constants.selfEndedCall}")
+//                    if (Constants.selfEndedCall) return
                     endCall(true)
                 }
             })
@@ -88,7 +90,7 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
     fun saveBattery(context: Context) {
         var oldBattery: Int = -1
         val batteryStatus = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { iFilter ->
-            context.registerReceiver(object : BroadcastReceiver() {
+            batteryReceiver = object : BroadcastReceiver() {
                 override fun onReceive(p0: Context?, p1: Intent?) {
                     val battery = p1?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
                     if (battery != -1 && oldBattery != battery) {
@@ -96,12 +98,23 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
                         saveBatteryToFirebase(battery)
                     }
                 }
-            }, iFilter)
+            }
+            Log.d(TAG, "Register battery")
+            context.registerReceiver(batteryReceiver, iFilter)
         }
         oldBattery =
             batteryStatus?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
         if (oldBattery != -1) {
             saveBatteryToFirebase(oldBattery)
+        }
+    }
+
+    fun unregisterBatteryReceiver(context: Context) {
+        Log.d(TAG, "Unregister battery")
+        try {
+            context.unregisterReceiver(batteryReceiver)
+        } catch (e: Exception) {
+            Log.w(TAG, "${e.message}", e)
         }
     }
 

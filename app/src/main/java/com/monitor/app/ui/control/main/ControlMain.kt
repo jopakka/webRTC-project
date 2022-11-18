@@ -11,9 +11,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.monitor.app.R
 import com.monitor.app.core.components.SensorList
+import com.monitor.app.core.components.Title
 import com.monitor.app.core.constants.Constants
 
 @Composable
@@ -34,7 +37,7 @@ fun ControlMainScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "House Monitor System") },
+                title = { Text(text = stringResource(R.string.app_name)) },
                 contentColor = Color.White,
                 elevation = 10.dp,
                 actions = {
@@ -62,11 +65,7 @@ fun ControlMainScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text(
-                    text = "Camera devices",
-                    modifier = Modifier.padding(vertical = 20.dp),
-                    style = MaterialTheme.typography.h4
-                )
+                Title(stringResource(R.string.camera_devices))
                 SensorList(sensors = sensors) { id ->
                     onSensorSelected(id)
                 }
