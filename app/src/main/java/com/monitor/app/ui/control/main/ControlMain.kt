@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,9 +22,11 @@ fun ControlMainScreen(
     viewModel: ControlMainViewModel = viewModel(
         factory = ControlMainViewModelFactory(userId)
     ),
-    onSensorSelected: (id: String) -> Unit
+    onSensorSelected: (id: String) -> Unit,
+    onChangeDeviceType: () -> Unit
 ) {
     val sensors = viewModel.sensors
+    var displayMenu by remember { mutableStateOf(false) }
 
     Constants.isIntiatedNow = true
     Constants.isCallEnded = true
@@ -36,8 +38,18 @@ fun ControlMainScreen(
                 contentColor = Color.White,
                 elevation = 10.dp,
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { displayMenu = !displayMenu }) {
                         Icon(Icons.Filled.MoreHoriz, contentDescription = "Options")
+                    }
+
+                    DropdownMenu(
+                        expanded = displayMenu,
+                        onDismissRequest = { displayMenu = false }) {
+                        DropdownMenuItem(onClick = {
+                            onChangeDeviceType()
+                        }) {
+                            Text(text = "Change device type")
+                        }
                     }
                 }
             )
