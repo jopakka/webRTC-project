@@ -82,7 +82,7 @@ fun AppNavHost(
             }
         }
         composable(Screens.CONTROL_MAIN.name) {
-            ControlMainScreen(userId = userId, onSensorSelected = { id ->
+            ControlMainScreen(userId = userId!!, onSensorSelected = { id ->
                 navController.navigate("${Screens.SENSOR_VIEW.name}/$id")
             }, onChangeDeviceType = {
                 navController.navigate(Screens.DEVICE_TYPE_VIEW.name)
