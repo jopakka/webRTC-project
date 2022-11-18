@@ -82,9 +82,11 @@ fun AppNavHost(
             }
         }
         composable(Screens.CONTROL_MAIN.name) {
-            ControlMainScreen(userId!!) { id ->
+            ControlMainScreen(userId = userId, onSensorSelected = { id ->
                 navController.navigate("${Screens.SENSOR_VIEW.name}/$id")
-            }
+            }, onChangeDeviceType = {
+                navController.navigate(Screens.DEVICE_TYPE_VIEW.name)
+            })
         }
         composable("${Screens.SENSOR_SEND.name}/{sensorID}") {
             val sensor = it.arguments?.getString("sensorID") ?: return@composable
