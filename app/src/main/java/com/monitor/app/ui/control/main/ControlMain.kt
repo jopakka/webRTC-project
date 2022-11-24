@@ -66,8 +66,10 @@ fun ControlMainScreen(
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
                 Title(stringResource(R.string.camera_devices))
-                SensorList(sensors = sensors) { id ->
-                    onSensorSelected(id)
+                Column(Modifier.padding(8.dp)) {
+                    SensorList(sensors = sensors) { id ->
+                        onSensorSelected(id)
+                    }
                 }
             }
         }
