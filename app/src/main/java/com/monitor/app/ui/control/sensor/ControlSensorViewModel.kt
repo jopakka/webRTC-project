@@ -7,10 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.monitor.app.core.DataCommands
-import com.monitor.app.data.rtcclient.AppSdpObserver
-import com.monitor.app.data.rtcclient.DataChannelObserver
-import com.monitor.app.data.rtcclient.PeerConnectionObserver
-import com.monitor.app.data.rtcclient.RTCClient
+import com.monitor.app.data.rtcclient.*
 import com.monitor.app.data.signalingclient.SignalingClient
 import com.monitor.app.data.signalingclient.SignalingClientObserver
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,6 +30,8 @@ class ControlSensorViewModel(private val userId: String, private val sensorId: S
         private set
     var callEnded by mutableStateOf(false)
         private set
+    var microphoneState by mutableStateOf(false)
+        private set
 
     private val sdpObserver = object : AppSdpObserver() {
         override fun onCreateSuccess(p0: SessionDescription?) {
@@ -42,7 +41,11 @@ class ControlSensorViewModel(private val userId: String, private val sensorId: S
         }
     }
 
-    fun init(application: Application, videoView: SurfaceViewRenderer) {
+    fun init(
+        application: Application,
+        remoteView: SurfaceViewRenderer,
+        localView: SurfaceViewRenderer
+    ) {
         if (isInitialized) {
             return
         }
@@ -59,12 +62,15 @@ class ControlSensorViewModel(private val userId: String, private val sensorId: S
 
                 override fun onAddStream(p0: MediaStream?) {
                     super.onAddStream(p0)
-                    p0?.videoTracks?.get(0)?.addSink(videoView)
+                    p0?.videoTracks?.get(0)?.addSink(remoteView)
                 }
             }
         )
 
-        mRtcClient.value?.initSurfaceView(videoView)
+        mRtcClient.value?.initSurfaceView(localView)
+        mRtcClient.value?.initSurfaceView(remoteView)
+        mRtcClient.value?.startLocalVideoCapture(localView)
+        mRtcClient.value?.enableAudio(microphoneState)
 
         mSignalingClient.value = SignalingClient(
             userId,
@@ -75,6 +81,12 @@ class ControlSensorViewModel(private val userId: String, private val sensorId: S
                     endCall()
                 }
             })
+    }
+
+    fun toggleMicrophone() {
+        val newState = !microphoneState
+        microphoneState = newState
+        mRtcClient.value?.enableAudio(newState)
     }
 
     fun endCall(recall: Boolean = false) {

@@ -26,6 +26,7 @@
     <string name="device_sensor_info">Choose this if this device is going to be used as security camera</string>
 
     <string name="description_change_camera">Change camera</string>
+    <string name="description_toggle_mic">Toggle microphone</string>
     <string name="retype_your_password">Retype Your Password</string>
 
     <string name="create_an_account">Create An Account</string>
