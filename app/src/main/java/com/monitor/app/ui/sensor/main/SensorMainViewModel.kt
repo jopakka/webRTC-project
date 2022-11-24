@@ -17,15 +17,14 @@ import com.google.firebase.ktx.Firebase
 import com.monitor.app.core.DataCommands
 import com.monitor.app.core.SensorStatuses
 import com.monitor.app.core.constants.Constants
-import com.monitor.app.data.rtcclient.AppSdpObserver
-import com.monitor.app.data.rtcclient.DataChannelObserver
-import com.monitor.app.data.rtcclient.PeerConnectionObserver
-import com.monitor.app.data.rtcclient.RTCClient
+import com.monitor.app.data.rtcclient.*
 import com.monitor.app.data.signalingclient.SignalingClient
 import com.monitor.app.data.signalingclient.SignalingClientObserver
 import io.ktor.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.webrtc.DataChannel
+import org.webrtc.IceCandidate
+import org.webrtc.MediaStream
 import org.webrtc.SurfaceViewRenderer
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -40,12 +39,19 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
     private val sdpObserver = object : AppSdpObserver() {}
     private val firestore = Firebase.firestore
     private var batteryReceiver: BroadcastReceiver? = null
+    private var audioManager: RTCAudioManager? = null
 
-    fun init(application: Application, videoView: SurfaceViewRenderer) {
+    fun init(
+        application: Application,
+        localView: SurfaceViewRenderer,
+        remoteView: SurfaceViewRenderer
+    ) {
         if (isInitialized) {
             return
         }
         isInitialized = true
+
+        audioManager = RTCAudioManager.create(application)
 
         mRtcClient.value = RTCClient(
             application,
@@ -59,11 +65,23 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
                         DataCommands.CAMERA -> switchCamera()
                     }
                 }
-            }) {}
+            }) {
+                override fun onIceCandidate(p0: IceCandidate?) {
+                    super.onIceCandidate(p0)
+                    mSignalingClient.value?.sendIceCandidate(p0, false)
+                    mRtcClient.value?.addIceCandidate(p0)
+                }
+
+                override fun onAddStream(p0: MediaStream?) {
+                    super.onAddStream(p0)
+                    p0?.videoTracks?.get(0)?.addSink(remoteView)
+                }
+            }
         )
 
-        mRtcClient.value?.initSurfaceView(videoView)
-        mRtcClient.value?.startLocalVideoCapture(videoView)
+        mRtcClient.value?.initSurfaceView(localView)
+        mRtcClient.value?.initSurfaceView(remoteView)
+        mRtcClient.value?.startLocalVideoCapture(localView)
         mSignalingClient.value = SignalingClient(
             userId,
             sensorId,
