@@ -12,4 +12,6 @@
 <br/>For more details please check the below link.<br/>
 https://firebase.google.com/docs/android/setup
 
+- You need to enable Firestore and Email-Password Authentication
+
 Once the setup is done you can run the project in Android Studio.
