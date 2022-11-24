@@ -4,10 +4,8 @@ import android.Manifest
 import android.app.Application
 import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
@@ -15,6 +13,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
@@ -88,18 +88,42 @@ fun SensorMainScreen(
                 Icon(Icons.Filled.Camera, stringResource(R.string.description_change_camera))
             }
         }) {
-            Column(
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxSize(1f)
                     .padding(it)
             ) {
-                WebRTCVideoView { videoView ->
-                    remoteView = videoView
-                }
-                Column(modifier = Modifier.height(0.dp)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
                     WebRTCVideoView { videoView ->
-                        localView = videoView
+                        remoteView = videoView
                     }
+                    Column(modifier = Modifier.height(0.dp)) {
+                        WebRTCVideoView { videoView ->
+                            localView = videoView
+                        }
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(1f)
+                        .height(100.dp)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                0.0f to Color.Black,
+                                0.25f to Color(0xE6000000),
+                                0.50f to Color(0xBF000000),
+                                0.75f to Color(0x80000000),
+                                0.99f to Color(0x40000000),
+                                1.0f to Color.Transparent,
+                                startY = 0f,
+                                endY = Float.POSITIVE_INFINITY
+                            )
+                        )
+                ) {
+
                 }
             }
         }
