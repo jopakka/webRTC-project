@@ -38,12 +38,17 @@ class ControlMainViewModel(private val userId: String) : ViewModel() {
 
                 querySnapshot.documentChanges.forEach {
                     val id = it.document.id
+                    Log.d(TAG, "id: $id changed")
                     when (it.type) {
                         DocumentChange.Type.REMOVED -> {
                             _sensors.remove(id)
                         }
                         else -> {
                             val sensor = createSensorInfo(it.document) ?: return@forEach
+                            if (!sensor.visible) {
+                                _sensors.remove(id)
+                                return@forEach
+                            }
                             _sensors[id] = sensor
                         }
                     }
@@ -58,6 +63,11 @@ class ControlMainViewModel(private val userId: String) : ViewModel() {
         val data = snapshot.data
         val key = snapshot.id
         try {
+            val visible = try {
+                data["visible"] as Boolean
+            } catch (e: Exception) {
+                true
+            }
             val status = when (data["status"].toString()) {
                 SensorStatuses.OFFLINE.name -> SensorStatuses.OFFLINE
                 SensorStatuses.ONLINE.name -> SensorStatuses.ONLINE
@@ -71,12 +81,24 @@ class ControlMainViewModel(private val userId: String) : ViewModel() {
                 data["battery"].toString().toIntOrNull(),
                 status,
                 status == SensorStatuses.ONLINE && data["type"].toString() == "OFFER",
+                visible,
             )
             Log.d(TAG, "sensor=$info")
             return info
         } catch (e: Error) {
             Log.w(TAG, "${e.message}")
             return null
+        }
+    }
+
+    fun setItemVisibility(itemId: String, state: Boolean) {
+        try {
+            val data = mapOf("visible" to state)
+            firestore.collection(userId).document(itemId).update(data).addOnSuccessListener {
+                Log.d(TAG, "Item '${itemId} updated successfully'")
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "${e.message}")
         }
     }
 }

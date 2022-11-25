@@ -7,6 +7,8 @@
     <string name="sensors">Sensors</string>
     <string name="next">Next</string>
     <string name="ok">OK</string>
+    <string name="yes">YES</string>
+    <string name="no">NO</string>
     <string name="camera_devices">Camera devices</string>
     <string name="placeholder_email">abc@gmail.com</string>
     <string name="placeholder_password">Password</string>

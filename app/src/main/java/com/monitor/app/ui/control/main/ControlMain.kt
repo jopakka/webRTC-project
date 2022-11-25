@@ -67,7 +67,9 @@ fun ControlMainScreen(
             ) {
                 Title(stringResource(R.string.camera_devices))
                 Column(Modifier.padding(8.dp)) {
-                    SensorList(sensors = sensors) { id ->
+                    SensorList(sensors = sensors, changeItemVisibility = { id, state ->
+                        viewModel.setItemVisibility(id, state)
+                    }) { id ->
                         onSensorSelected(id)
                     }
                 }
