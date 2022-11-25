@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.monitor.app.core.DataCommands
@@ -51,49 +52,66 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
         }
         isInitialized = true
 
-        audioManager = RTCAudioManager.create(application)
+        val document = firestore.collection(userId).document(sensorId)
+        val collection = document.collection("candidates")
+        val answer = collection.document("answerCandidate")
+        val offer = collection.document("offerCandidate")
 
-        mRtcClient.value = RTCClient(
-            application,
-            object : PeerConnectionObserver(mSignalingClient.value, mRtcClient.value, true, object :
-                DataChannelObserver() {
-                override fun onMessage(p0: DataChannel.Buffer?) {
-                    super.onMessage(p0)
-                    val byteBuffer = p0?.data?.moveToByteArray() ?: ByteArray(0)
+        firestore.runBatch {
+            answer.delete()
+            offer.delete()
+            document.update(
+                hashMapOf<String, Any>(
+                    "type" to FieldValue.delete(),
+                    "sdp" to FieldValue.delete(),
+                )
+            )
+        }.addOnSuccessListener {
+            audioManager = RTCAudioManager.create(application)
 
-                    when (DataCommands.valueOf(String(byteBuffer))) {
-                        DataCommands.CAMERA -> switchCamera()
+            mRtcClient.value = RTCClient(
+                application,
+                object : PeerConnectionObserver(object :
+                    DataChannelObserver() {
+                    override fun onMessage(p0: DataChannel.Buffer?) {
+                        super.onMessage(p0)
+                        val byteBuffer = p0?.data?.moveToByteArray() ?: ByteArray(0)
+                        val message = String(byteBuffer)
+                        Log.d(TAG, "message: $message")
+
+                        when (DataCommands.valueOf(message)) {
+                            DataCommands.CAMERA -> switchCamera()
+                        }
+                    }
+                }) {
+                    override fun onIceCandidate(p0: IceCandidate?) {
+                        super.onIceCandidate(p0)
+                        mSignalingClient.value?.sendIceCandidate(p0, true)
+                        mRtcClient.value?.addIceCandidate(p0)
+                    }
+
+                    override fun onAddStream(p0: MediaStream?) {
+                        super.onAddStream(p0)
+                        p0?.videoTracks?.get(0)?.addSink(remoteView)
                     }
                 }
-            }) {
-                override fun onIceCandidate(p0: IceCandidate?) {
-                    super.onIceCandidate(p0)
-                    mSignalingClient.value?.sendIceCandidate(p0, false)
-                    mRtcClient.value?.addIceCandidate(p0)
-                }
+            )
 
-                override fun onAddStream(p0: MediaStream?) {
-                    super.onAddStream(p0)
-                    p0?.videoTracks?.get(0)?.addSink(remoteView)
-                }
-            }
-        )
-
-        mRtcClient.value?.initSurfaceView(localView)
-        mRtcClient.value?.initSurfaceView(remoteView)
-        mRtcClient.value?.startLocalVideoCapture(localView)
-        mSignalingClient.value = SignalingClient(
-            userId,
-            sensorId,
-            object : SignalingClientObserver(mRtcClient.value, sdpObserver, userId, sensorId) {
-                override fun onCallEnded() {
-                    super.onCallEnded()
-                    Log.d(TAG, "onCallEnded selfEndedCall=${Constants.selfEndedCall}")
-//                    if (Constants.selfEndedCall) return
-                    endCall(true)
-                }
-            })
-        mRtcClient.value?.call(sdpObserver, userId, sensorId)
+            mRtcClient.value?.initSurfaceView(localView)
+            mRtcClient.value?.initSurfaceView(remoteView)
+            mRtcClient.value?.startLocalVideoCapture(localView)
+            mSignalingClient.value = SignalingClient(
+                userId,
+                sensorId,
+                object : SignalingClientObserver(mRtcClient.value, sdpObserver, userId, sensorId) {
+                    override fun onCallEnded() {
+                        super.onCallEnded()
+                        Log.d(TAG, "onCallEnded selfEndedCall=${Constants.selfEndedCall}")
+                        endCall(true)
+                    }
+                })
+            mRtcClient.value?.call(sdpObserver, userId, sensorId)
+        }
     }
 
     fun switchCamera() {
