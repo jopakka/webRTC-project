@@ -32,6 +32,7 @@ class ControlSensorViewModel(private val userId: String, private val sensorId: S
         private set
     var microphoneState by mutableStateOf(false)
         private set
+    private var audioManager: RTCAudioManager? = null
 
     private val sdpObserver = object : AppSdpObserver() {
         override fun onCreateSuccess(p0: SessionDescription?) {
@@ -51,9 +52,11 @@ class ControlSensorViewModel(private val userId: String, private val sensorId: S
         }
         isInitialized = true
 
+        audioManager = RTCAudioManager.create(application)
+
         mRtcClient.value = RTCClient(
             application,
-            object : PeerConnectionObserver(dataObserver = object : DataChannelObserver() {}) {
+            object : PeerConnectionObserver(object : DataChannelObserver() {}) {
                 override fun onIceCandidate(p0: IceCandidate?) {
                     super.onIceCandidate(p0)
                     mSignalingClient.value?.sendIceCandidate(p0, false)

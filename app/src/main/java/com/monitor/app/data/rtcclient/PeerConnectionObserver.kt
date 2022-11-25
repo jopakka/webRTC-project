@@ -1,15 +1,9 @@
 package com.monitor.app.data.rtcclient
 
 import android.util.Log
-import com.monitor.app.data.signalingclient.SignalingClient
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.webrtc.*
 
-@OptIn(ExperimentalCoroutinesApi::class)
 open class PeerConnectionObserver(
-    private val signalingClient: SignalingClient? = null,
-    private val rtcClient: RTCClient? = null,
-    private val isSensor: Boolean = false,
     private val dataObserver: DataChannelObserver,
 ) : PeerConnection.Observer {
     companion object {
@@ -18,8 +12,6 @@ open class PeerConnectionObserver(
 
     override fun onIceCandidate(p0: IceCandidate?) {
         Log.d(TAG, "onIceCandidate: $p0")
-        signalingClient?.sendIceCandidate(p0, isSensor)
-        rtcClient?.addIceCandidate(p0)
     }
 
     override fun onDataChannel(p0: DataChannel?) {

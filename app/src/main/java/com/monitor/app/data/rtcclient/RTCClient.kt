@@ -116,7 +116,7 @@ class RTCClient(
     }
 
     private fun PeerConnection.call(sdpObserver: SdpObserver, userID: String, sensorID: String) {
-        Log.d(TAG, "Calling")
+        Log.d(TAG, "PeerConnection Calling")
         val constraints = MediaConstraints().apply {
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
             mandatory.add(MediaConstraints.KeyValuePair("IceRestart", "true"))
@@ -140,7 +140,6 @@ class RTCClient(
                             .addOnFailureListener { e ->
                                 Log.e(TAG, "Error adding document", e)
                             }
-                        Log.d(TAG, "onSetSuccess")
                     }
                 }, desc)
                 sdpObserver.onCreateSuccess(desc)
@@ -157,7 +156,7 @@ class RTCClient(
     }
 
     private fun PeerConnection.answer(sdpObserver: SdpObserver, userID: String, sensorID: String) {
-        Log.d(TAG, "Answering")
+        Log.d(TAG, "PeerConnection Answering")
         val constraints = MediaConstraints().apply {
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
             mandatory.add(MediaConstraints.KeyValuePair("IceRestart", "true"))
