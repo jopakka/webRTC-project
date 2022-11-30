@@ -46,6 +46,15 @@ fun ControlSensorScreen(
     onNavigateBack: () -> Unit
 ) {
     KeepScreenOn()
+
+    val backAction = {
+        viewModel.endCall()
+        onNavigateBack()
+    }
+
+    if (viewModel.shouldNavigateBack) {
+        backAction()
+    }
     val application = LocalContext.current.applicationContext as Application
 
     var remoteView by remember { mutableStateOf<SurfaceViewRenderer?>(null) }
@@ -138,8 +147,5 @@ fun ControlSensorScreen(
         }
     }
 
-    BackHandler {
-        viewModel.endCall()
-        onNavigateBack()
-    }
+    BackHandler(onBack = backAction)
 }

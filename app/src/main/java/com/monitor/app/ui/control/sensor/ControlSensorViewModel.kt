@@ -1,6 +1,8 @@
 package com.monitor.app.ui.control.sensor
 
 import android.app.Application
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -40,6 +42,16 @@ class ControlSensorViewModel(private val userId: String, private val sensorId: S
             isLoading = false
             callEnded = false
         }
+    }
+    var shouldNavigateBack by mutableStateOf(false)
+        private set
+
+    init {
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (isLoading) {
+                shouldNavigateBack = true
+            }
+        }, 10_000)
     }
 
     fun init(
