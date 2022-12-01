@@ -14,8 +14,25 @@ class SensorInitViewModel(private val userId: String) : ViewModel() {
 
     private val firestore = Firebase.firestore
 
-    fun addSensor(name: String, info: String, onComplete: (id: String?, error: Error?) -> Unit) {
+    fun updateSensor(
+        name: String,
+        info: String,
+        sensorId: String?,
+        onComplete: (id: String?, error: Error?) -> Unit
+    ) {
         try {
+            sensorId?.let {
+                firestore.collection(userId).document(sensorId).update(
+                    mapOf(
+                        "info" to info,
+                        "name" to name
+                    )
+                ).addOnSuccessListener {
+                    onComplete(sensorId, null)
+                }
+                return
+            }
+
             val sensor = SensorInfo(name, info)
             firestore.collection(userId).add(sensor).addOnSuccessListener {
                 val id = it.id
@@ -28,15 +45,6 @@ class SensorInitViewModel(private val userId: String) : ViewModel() {
         } catch (e: Error) {
             Log.e(TAG, "${e.message}")
             onComplete(null, e)
-        }
-    }
-
-    fun updateSensor(id: String) {
-        try {
-            // firestore.collection(userId).document(id).update(mapOf("id" to))
-        } catch (e: Error) {
-            Log.e(TAG, "${e.message}")
-            // onComplete(null, e)
         }
     }
 }

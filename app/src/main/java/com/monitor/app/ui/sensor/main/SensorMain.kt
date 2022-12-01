@@ -38,7 +38,7 @@ fun SensorMainScreen(
         factory = SensorMainViewModelFactory(userId, sensorId)
     ),
     onNavigateBack: () -> Unit,
-    onChangeInformation: () -> Unit,
+    onChangeInformation: (id: String) -> Unit,
     onChangeDeviceType: () -> Unit
 ) {
     KeepScreenOn()
@@ -150,7 +150,7 @@ fun SensorMainScreen(
                                 Text(text = "Change device type")
                             }
                             DropdownMenuItem(onClick = {
-                                onChangeInformation
+                                onChangeInformation(sensorId)
                             }) {
                                 Text(text = "Change information")
                             }
