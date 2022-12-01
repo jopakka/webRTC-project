@@ -67,11 +67,20 @@ fun AppNavHost(
                 }
             }
         }
-        composable(Screens.DEVICE_TYPE_VIEW.name) {
+        composable(
+            "${Screens.DEVICE_TYPE_VIEW.name}?sensorID={sensorID}",
+            arguments = listOf(navArgument("sensorID") {
+                nullable = true
+                defaultValue = null
+                type = NavType.StringType
+            })
+        ) {
+            val sensorId = it.arguments?.getString("sensorID", null)
             DeviceTypeView { deviceType ->
                 navController.navigate(
                     when (deviceType) {
-                        DeviceTypes.SENSOR -> Screens.SENSOR_INIT.name
+                        DeviceTypes.SENSOR -> sensorId?.let { "${Screens.SENSOR_INIT.name}?sensorID=$sensorId" }
+                            ?: Screens.SENSOR_INIT.name
                         DeviceTypes.MAIN -> Screens.CONTROL_MAIN.name
                         else -> return@DeviceTypeView
                     }
@@ -104,8 +113,8 @@ fun AppNavHost(
                 userId!!,
                 sensor,
                 onNavigateBack = { activity.finish() },
-                onChangeDeviceType = {
-                    navController.navigate(Screens.DEVICE_TYPE_VIEW.name)
+                onChangeDeviceType = { id ->
+                    navController.navigate("${Screens.DEVICE_TYPE_VIEW.name}?sensorID=$id")
                 },
                 onChangeInformation = { id ->
                     navController.navigate("${Screens.SENSOR_INIT.name}?sensorID=$id")
