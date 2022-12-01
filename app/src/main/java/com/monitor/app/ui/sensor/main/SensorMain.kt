@@ -25,7 +25,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.monitor.app.R
 import com.monitor.app.core.SensorStatuses
-import com.monitor.app.core.components.BatteryLevel
 import com.monitor.app.core.components.KeepScreenOn
 import com.monitor.app.core.components.WebRTCVideoView
 import org.webrtc.SurfaceViewRenderer
@@ -127,7 +126,6 @@ fun SensorMainScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    BatteryLevel(batteryLevel = 20)
                     Text(
                         text = "LIVING ROOM",
                         style = MaterialTheme.typography.h6,
