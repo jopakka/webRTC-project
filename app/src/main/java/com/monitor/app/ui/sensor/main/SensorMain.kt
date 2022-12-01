@@ -39,7 +39,7 @@ fun SensorMainScreen(
     ),
     onNavigateBack: () -> Unit,
     onChangeInformation: (id: String) -> Unit,
-    onChangeDeviceType: () -> Unit
+    onChangeDeviceType: (id: String) -> Unit
 ) {
     KeepScreenOn()
 
@@ -145,7 +145,7 @@ fun SensorMainScreen(
                             expanded = displayMenu,
                             onDismissRequest = { displayMenu = false }) {
                             DropdownMenuItem(onClick = {
-                                onChangeDeviceType()
+                                onChangeDeviceType(sensorId)
                             }) {
                                 Text(text = "Change device type")
                             }
