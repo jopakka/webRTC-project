@@ -6,18 +6,15 @@ import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MicOff
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
@@ -31,6 +28,7 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.monitor.app.R
 import com.monitor.app.core.DataCommands
 import com.monitor.app.core.components.AlertDialogOk
+import com.monitor.app.core.components.BatteryLevel
 import com.monitor.app.core.components.KeepScreenOn
 import com.monitor.app.core.components.WebRTCVideoView
 import org.webrtc.SurfaceViewRenderer
@@ -107,31 +105,72 @@ fun ControlSensorScreen(
                 FloatingActionButton(onClick = {
                     viewModel.sendData(DataCommands.CAMERA)
                 }) {
-                    Icon(Icons.Filled.Camera, stringResource(R.string.description_change_camera))
+                    Icon(
+                        Icons.Filled.Cameraswitch,
+                        stringResource(R.string.description_change_camera)
+                    )
                 }
             }
         }) {
-            Column(
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxSize(1f)
                     .padding(it)
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize(if (viewModel.isLoading) 1f else 0f)
-                        .background(colorResource(R.color.black)),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .fillMaxSize()
                 ) {
-                    CircularProgressIndicator()
-                }
-                WebRTCVideoView { videoView ->
-                    remoteView = videoView
-                }
-                Column(modifier = Modifier.height(0.dp)) {
-                    WebRTCVideoView { videoView ->
-                        localView = videoView
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(if (viewModel.isLoading) 1f else 0f)
+                            .background(colorResource(R.color.black)),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
                     }
+                    WebRTCVideoView { videoView ->
+                        remoteView = videoView
+                    }
+                    Column(modifier = Modifier.height(0.dp)) {
+                        WebRTCVideoView { videoView ->
+                            localView = videoView
+                        }
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(1f)
+                        .height(80.dp)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                0.0f to Color.Black,
+                                0.25f to Color(0xE6000000),
+                                0.50f to Color(0xBF000000),
+                                0.75f to Color(0x80000000),
+                                0.99f to Color(0x40000000),
+                                1.0f to Color.Transparent,
+                                startY = 0f,
+                                endY = Float.POSITIVE_INFINITY
+                            )
+                        )
+                        .padding(20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = {
+                        viewModel.endCall()
+                        onNavigateBack()
+                    }) {
+                        Icon(Icons.Filled.ArrowBack, "Navigate Back", tint = Color.White)
+                    }
+                    Text(
+                        text = "LIVING ROOM",
+                        style = MaterialTheme.typography.h6,
+                        color = Color.White
+                    )
+                    BatteryLevel(batteryLevel = 20)
                 }
             }
         }
