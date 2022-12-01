@@ -37,7 +37,9 @@ fun SensorMainScreen(
     viewModel: SensorMainViewModel = viewModel(
         factory = SensorMainViewModelFactory(userId, sensorId)
     ),
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onChangeInformation: () -> Unit,
+    onChangeDeviceType: () -> Unit
 ) {
     KeepScreenOn()
 
@@ -143,10 +145,13 @@ fun SensorMainScreen(
                             expanded = displayMenu,
                             onDismissRequest = { displayMenu = false }) {
                             DropdownMenuItem(onClick = {
+                                onChangeDeviceType()
                             }) {
                                 Text(text = "Change device type")
                             }
-                            DropdownMenuItem(onClick = {}) {
+                            DropdownMenuItem(onClick = {
+                                onChangeInformation
+                            }) {
                                 Text(text = "Change information")
                             }
                         }

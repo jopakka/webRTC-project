@@ -30,6 +30,15 @@ class SensorInitViewModel(private val userId: String) : ViewModel() {
             onComplete(null, e)
         }
     }
+
+    fun updateSensor(id: String) {
+        try {
+            // firestore.collection(userId).document(id).update(mapOf("id" to))
+        } catch (e: Error) {
+            Log.e(TAG, "${e.message}")
+            // onComplete(null, e)
+        }
+    }
 }
 
 class SensorInitViewModelFactory(private val userId: String) :
