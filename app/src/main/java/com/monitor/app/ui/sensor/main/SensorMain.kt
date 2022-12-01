@@ -8,8 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,7 +86,7 @@ fun SensorMainScreen(
             FloatingActionButton(onClick = {
                 viewModel.switchCamera()
             }) {
-                Icon(Icons.Filled.Camera, stringResource(R.string.description_change_camera))
+                Icon(Icons.Filled.Cameraswitch, stringResource(R.string.description_change_camera))
             }
         }) {
             Box(
