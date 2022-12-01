@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SensorInitScreen(
     userId: String,
+    sensorId: String?,
     viewModel: SensorInitViewModel = viewModel(
         factory = SensorInitViewModelFactory(userId)
     ),
@@ -40,11 +41,11 @@ fun SensorInitScreen(
 
     val onClick = {
         loading = true
-        viewModel.addSensor(name, info) { id, error ->
+        viewModel.updateSensor(name, info, sensorId) { id, error ->
             loading = false
             if (error != null || id == null) {
                 errorToast.show()
-                return@addSensor
+                return@updateSensor
             }
             scope.launch {
                 dataStore.saveDeviceId(id)

@@ -4,9 +4,11 @@ import android.app.Activity
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.google.firebase.auth.FirebaseAuth
 import com.monitor.app.core.DeviceTypes
 import com.monitor.app.core.Screens
@@ -76,9 +78,17 @@ fun AppNavHost(
                 )
             }
         }
-        composable(Screens.SENSOR_INIT.name) {
-            SensorInitScreen(userId!!) { id ->
-                navController.navigate("${Screens.SENSOR_SEND.name}/${id}")
+        composable(
+            "${Screens.SENSOR_INIT.name}?sensorID={sensorID}",
+            arguments = listOf(navArgument("sensorID") {
+                nullable = true
+                defaultValue = null
+                type = NavType.StringType
+            })
+        ) {
+            val sensorId = it.arguments?.getString("sensorID", null)
+            SensorInitScreen(userId!!, sensorId) { id ->
+                navController.navigate("${Screens.SENSOR_SEND.name}/$id")
             }
         }
         composable(Screens.CONTROL_MAIN.name) {
@@ -97,8 +107,8 @@ fun AppNavHost(
                 onChangeDeviceType = {
                     navController.navigate(Screens.DEVICE_TYPE_VIEW.name)
                 },
-                onChangeInformation = {
-
+                onChangeInformation = { id ->
+                    navController.navigate("${Screens.SENSOR_INIT.name}?sensorID=$id")
                 })
         }
         composable("${Screens.SENSOR_VIEW.name}/{sensorID}") {
