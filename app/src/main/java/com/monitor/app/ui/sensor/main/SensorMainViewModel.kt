@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -23,6 +24,9 @@ import com.monitor.app.data.signalingclient.SignalingClient
 import com.monitor.app.data.signalingclient.SignalingClientObserver
 import io.ktor.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import org.webrtc.DataChannel
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
@@ -41,6 +45,9 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
     private val firestore = Firebase.firestore
     private var batteryReceiver: BroadcastReceiver? = null
     private var audioManager: RTCAudioManager? = null
+
+    private val _name = MutableStateFlow<String?>(null)
+    val name: StateFlow<String?> = _name.asStateFlow()
 
     fun init(
         application: Application,
@@ -112,6 +119,7 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
                 })
             mRtcClient.value?.call(sdpObserver, userId, sensorId)
         }
+        getSensorName(document)
     }
 
     fun switchCamera() {
@@ -165,6 +173,22 @@ class SensorMainViewModel(private val userId: String, private val sensorId: Stri
 
     fun setStatus(status: SensorStatuses) {
         mRtcClient.value?.setStatus(userId, sensorId, status)
+    }
+
+    private fun getSensorName(document: DocumentReference) {
+        try {
+            document
+                .addSnapshotListener { querySnapshot, e ->
+                    if (e != null) {
+                        Log.w(TAG, "listen:error", e)
+                        return@addSnapshotListener
+                    }
+
+                    _name.value = querySnapshot?.get("name") as String?
+                }
+        } catch (e: Error) {
+            Log.e(TAG, "${e.message}")
+        }
     }
 }
 
