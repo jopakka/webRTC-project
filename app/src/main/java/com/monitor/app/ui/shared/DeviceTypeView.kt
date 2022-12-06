@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import com.monitor.app.R
 import com.monitor.app.core.DeviceTypes
 import com.monitor.app.core.components.MButton
-import com.monitor.app.core.components.MCard
 import com.monitor.app.core.components.SelectableItem
 import com.monitor.app.core.components.Title
 import com.monitor.app.data.utils.DataStoreUtil
@@ -43,36 +42,34 @@ fun DeviceTypeView(onDeviceSelected: (isMain: DeviceTypes) -> Unit) {
                     .fillMaxSize()
                     .padding(paddingValues),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(30.dp),
             ) {
                 Title(text = stringResource(R.string.choose_device_type))
-                MCard {
-                    Column(
-                        modifier = Modifier.padding(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                Column(
+                    modifier = Modifier.padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    SelectableItem(
+                        selected = deviceType == DeviceTypes.MAIN,
+                        title = stringResource(R.string.device_main),
+                        subtitle = stringResource(R.string.device_main_info)
                     ) {
-                        SelectableItem(
-                            selected = deviceType == DeviceTypes.MAIN,
-                            title = stringResource(R.string.device_main),
-                            subtitle = stringResource(R.string.device_main_info)
-                        ) {
-                            deviceType = DeviceTypes.MAIN
-                        }
-                        SelectableItem(
-                            selected = deviceType == DeviceTypes.SENSOR,
-                            title = stringResource(R.string.device_sensor),
-                            subtitle = stringResource(R.string.device_sensor_info)
-                        ) {
-                            deviceType = DeviceTypes.SENSOR
-                        }
-                        MButton(
-                            text = stringResource(R.string.next),
-                            enabled = deviceType?.let { true } ?: false) {
-                            scope.launch {
-                                deviceType ?: return@launch
-                                dataStore.saveDeviceType(deviceType!!)
-                                onDeviceSelected(deviceType!!)
-                            }
+                        deviceType = DeviceTypes.MAIN
+                    }
+                    SelectableItem(
+                        selected = deviceType == DeviceTypes.SENSOR,
+                        title = stringResource(R.string.device_sensor),
+                        subtitle = stringResource(R.string.device_sensor_info)
+                    ) {
+                        deviceType = DeviceTypes.SENSOR
+                    }
+                    MButton(
+                        text = stringResource(R.string.next),
+                        enabled = deviceType?.let { true } ?: false) {
+                        scope.launch {
+                            deviceType ?: return@launch
+                            dataStore.saveDeviceType(deviceType!!)
+                            onDeviceSelected(deviceType!!)
                         }
                     }
                 }
