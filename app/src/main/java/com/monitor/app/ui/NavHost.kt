@@ -1,7 +1,7 @@
 package com.monitor.app.ui
 
 import android.app.Activity
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -27,26 +27,26 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
 ) {
-    var userId by remember {
-        mutableStateOf(auth.currentUser?.uid)
-    }
+//    var userId by remember {
+//        mutableStateOf(auth.currentUser?.uid)
+//    }
+    var userId = "user-2"
     NavHost(
         modifier = modifier, navController = navController, startDestination = Screens.SPLASH.name
     ) {
         composable(Screens.SPLASH.name) {
             SplashScreen { deviceType, sensorId ->
-                val navDir = when {
-                    auth.currentUser == null -> Screens.AUTH.name
-                    deviceType == DeviceTypes.NONE -> Screens.DEVICE_TYPE_VIEW.name
-                    deviceType == DeviceTypes.MAIN -> Screens.CONTROL_MAIN.name
-                    deviceType == DeviceTypes.SENSOR -> {
+                val navDir = when (deviceType) {
+                    DeviceTypes.NONE -> Screens.DEVICE_TYPE_VIEW.name
+                    DeviceTypes.MAIN -> Screens.CONTROL_MAIN.name
+                    DeviceTypes.SENSOR -> {
                         if (sensorId.isNotBlank()) {
                             "${Screens.SENSOR_SEND.name}/$sensorId"
                         } else {
                             Screens.DEVICE_TYPE_VIEW.name
                         }
                     }
-                    else -> return@SplashScreen
+//                    else -> return@SplashScreen
                 }
                 navController.navigate(navDir) {
                     popUpTo(Screens.SPLASH.name) {
