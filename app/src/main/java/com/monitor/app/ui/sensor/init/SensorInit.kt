@@ -17,7 +17,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.monitor.app.R
-import com.monitor.app.core.components.*
+import com.monitor.app.core.components.LoadingIndicator
+import com.monitor.app.core.components.MButton
+import com.monitor.app.core.components.TextInputField
+import com.monitor.app.core.components.Title
 import com.monitor.app.data.utils.DataStoreUtil
 import kotlinx.coroutines.launch
 
@@ -68,10 +71,9 @@ fun SensorInitScreen(
                     .fillMaxSize()
                     .padding(paddingValues),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(30.dp),
             ) {
                 Title(text = stringResource(R.string.give_sensor_info))
-                MCard {
                     Column(
                         modifier = Modifier.padding(8.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -98,7 +100,6 @@ fun SensorInitScreen(
                             onClick = onClick,
                         )
                     }
-                }
             }
         })
     LoadingIndicator(loading)
