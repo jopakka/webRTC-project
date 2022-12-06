@@ -57,6 +57,8 @@ fun ControlSensorScreen(
 
     var remoteView by remember { mutableStateOf<SurfaceViewRenderer?>(null) }
     var localView by remember { mutableStateOf<SurfaceViewRenderer?>(null) }
+    val batteryLevel by viewModel.batteryLevel.collectAsState()
+    val name by viewModel.name.collectAsState()
     val permissions = listOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
     val permissionState = rememberMultiplePermissionsState(permissions = permissions)
 
@@ -166,11 +168,11 @@ fun ControlSensorScreen(
                         Icon(Icons.Filled.ArrowBack, "Navigate Back", tint = Color.White)
                     }
                     Text(
-                        text = "LIVING ROOM",
+                        text = name?.uppercase() ?: "",
                         style = MaterialTheme.typography.h6,
                         color = Color.White
                     )
-                    BatteryLevel(batteryLevel = 20)
+                    BatteryLevel(batteryLevel = batteryLevel?.toInt())
                 }
             }
         }

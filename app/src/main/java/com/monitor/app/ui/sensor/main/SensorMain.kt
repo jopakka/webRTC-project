@@ -52,6 +52,8 @@ fun SensorMainScreen(
     val application = context.applicationContext as Application
     val permissionState = rememberMultiplePermissionsState(permissions = permissions)
 
+    val name by viewModel.name.collectAsState()
+
     if (remoteView != null && localView != null) {
         viewModel.init(application, remoteView!!, localView!!)
     }
@@ -129,7 +131,7 @@ fun SensorMainScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "LIVING ROOM",
+                        text = name?.uppercase() ?: "Camera device",
                         style = MaterialTheme.typography.h6,
                         color = Color.White
                     )
