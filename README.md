@@ -1,6 +1,8 @@
 
 # webRTC
 
+Android application which allows user to use their second Android phone as camera and their main phone as viewer. 
+
 ## Pre-requisites
  :heavy_check_mark: Setup Account on Firebase and integrate app with your Firebase Project.<br/>
 
