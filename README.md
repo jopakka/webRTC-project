@@ -1,5 +1,5 @@
 
-# webRTC
+# Home SuperVision
 
 Android application which allows user to use their second Android phone as camera and their main phone as viewer. 
 
